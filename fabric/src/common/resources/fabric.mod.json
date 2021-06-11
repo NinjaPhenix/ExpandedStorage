@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "accessWidener": "expandedstorage_base.accessWidener",
+  "accessWidener": "expandedstorage.accessWidener",
   "breaks": {
     "quilt_loader": "*"
   },

@@ -2,5 +2,5 @@
   "schemaVersion": 1,
   "id": "expandedstorage_common",
   "version": "0.0.0",
-  "accessWidener": "expandedstorage_base.accessWidener"
+  "accessWidener": "expandedstorage.accessWidener"
 }

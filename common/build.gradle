@@ -76,7 +76,7 @@ architectury {
 loom {
     silentMojangMappingsLicense()
     useFabricMixin = true
-    accessWidener = file('src/base/resources/expandedstorage_base.accessWidener')
+    accessWidener = file('src/common/resources/expandedstorage.accessWidener')
 }
 
 dependencies {
