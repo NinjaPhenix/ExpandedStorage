@@ -60,8 +60,7 @@ sourceSets {
                     "src/base/resources",
                     "src/chest/resources",
                     "src/old_chest/resources",
-                    "src/common/resources",
-                    "src/chest_compat/resources"
+                    "src/common/resources"
             ])
         }
     }
