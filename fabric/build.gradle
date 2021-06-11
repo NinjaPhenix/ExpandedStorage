@@ -59,6 +59,27 @@ tasks.withType(JavaExec).configureEach {
 
 // </editor-fold>
 
+sourceSets {
+    main {
+        java {
+            srcDirs([
+                    "src/barrel/java",
+                    "src/base/java",
+                    "src/chest/java",
+                    "src/old_chest/java"])
+        }
+        resources {
+            srcDirs([
+                    "src/barrel/resources",
+                    "src/base/resources",
+                    "src/chest/resources",
+                    "src/old_chest/resources",
+                    "src/common/resources"
+            ])
+        }
+    }
+}
+
 architectury {
     fabric()
     injectInjectables = false
@@ -156,7 +177,7 @@ shadowJar {
 remapJar {
     input.set shadowJar.archiveFile
     dependsOn shadowJar
-    archiveVersion = mod_version + "+" + minecraft_version // Feels hacky but works.
+    archiveVersion = mod_version + '+' + minecraft_version // Feels hacky but works.
 }
 
 jar {
