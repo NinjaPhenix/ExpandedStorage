@@ -45,6 +45,8 @@ tasks.withType(JavaExec).configureEach {
     })
 }
 
+// </editor-fold>
+
 sourceSets {
     main {
         java {
@@ -65,8 +67,6 @@ sourceSets {
         }
     }
 }
-
-// </editor-fold>
 
 architectury {
     fabric()

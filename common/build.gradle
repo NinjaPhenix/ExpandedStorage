@@ -44,6 +44,8 @@ tasks.withType(JavaExec).configureEach {
     })
 }
 
+// </editor-fold>
+
 sourceSets {
     main {
         java {
@@ -65,8 +67,6 @@ sourceSets {
         }
     }
 }
-
-// </editor-fold>
 
 architectury {
     common(rootProject.properties.forge_released.equals('true'))
