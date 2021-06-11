@@ -45,6 +45,28 @@ tasks.withType(JavaExec).configureEach {
     })
 }
 
+sourceSets {
+    main {
+        java {
+            srcDirs([
+                    "src/barrel/java",
+                    "src/base/java",
+                    "src/chest/java",
+                    "src/old_chest/java"])
+        }
+        resources {
+            srcDirs([
+                    "src/barrel/resources",
+                    "src/base/resources",
+                    "src/chest/resources",
+                    "src/old_chest/resources",
+                    "src/common/resources",
+                    "src/chest_compat/resources"
+            ])
+        }
+    }
+}
+
 // </editor-fold>
 
 architectury {
