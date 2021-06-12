@@ -14,9 +14,12 @@ import ninjaphenix.expandedstorage.base.internal_api.block.AbstractStorageBlock;
 import ninjaphenix.expandedstorage.base.internal_api.item.BlockUpgradeBehaviour;
 import ninjaphenix.expandedstorage.base.internal_api.tier.Tier;
 import ninjaphenix.expandedstorage.base.item.StorageConversionKit;
+import ninjaphenix.expandedstorage.base.platform.ConfigWrapper;
+import ninjaphenix.expandedstorage.base.platform.NetworkWrapper;
 import ninjaphenix.expandedstorage.base.platform.PlatformUtils;
 import org.jetbrains.annotations.ApiStatus;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -30,6 +33,9 @@ public final class BaseImpl implements BaseApi {
     private Map<ResourceLocation, Item> items = new LinkedHashMap<>();
     private Item tabIcon = Items.ENDER_CHEST;
     private int suitability = -1;
+    private ConfigWrapper configWrapper;
+    private NetworkWrapper networkWrapper;
+    private PlatformUtils platformWrapper;
 
     private BaseImpl() {
 
@@ -40,6 +46,33 @@ public final class BaseImpl implements BaseApi {
             BaseImpl.instance = new BaseImpl();
         }
         return BaseImpl.instance;
+    }
+
+    public void setWrapperInstances(String platform) {
+        platformWrapper = this.getClassInstance(PlatformUtils.class, platform, "ninjaphenix.expandedstorage.base.platform", "PlatformUtilsImpl");
+        configWrapper = this.getClassInstance(ConfigWrapper.class, platform, "ninjaphenix.expandedstorage.base.platform", "ConfigWrapperImpl");
+        networkWrapper = this.getClassInstance(NetworkWrapper.class, platform, "ninjaphenix.expandedstorage.base.platform", "NetworkWrapperImpl");
+        configWrapper.initialise();
+        networkWrapper.initialise();
+    }
+
+    private <T> T getClassInstance(Class<T> interfaceClass, String platform, String commonPackagePath, String className) {
+        String fullClassPath = commonPackagePath + "." + platform + "." + className;
+        try {
+            Class<?> clazz = Class.forName(fullClassPath, false, Utils.class.getClassLoader());
+            if (interfaceClass.isAssignableFrom(clazz)) {
+                try {
+                    //noinspection unchecked
+                    return (T) clazz.getMethod("getInstance").invoke(null);
+                } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+                    throw new IllegalStateException("Cannot find, access or call " + fullClassPath + "#getInstance.");
+                }
+            } else {
+                throw new IllegalStateException(fullClassPath + " should be an instance of " + interfaceClass.getName());
+            }
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException("No class found " + fullClassPath + ".");
+        }
     }
 
     @Override
@@ -121,5 +154,17 @@ public final class BaseImpl implements BaseApi {
     @ApiStatus.Internal
     public ItemStack tabIcon() {
         return new ItemStack(tabIcon);
+    }
+
+    public ConfigWrapper getConfigWrapper() {
+        return configWrapper;
+    }
+
+    public NetworkWrapper getNetworkWrapper() {
+        return networkWrapper;
+    }
+
+    public PlatformUtils getPlatformWrapper() {
+        return platformWrapper;
     }
 }

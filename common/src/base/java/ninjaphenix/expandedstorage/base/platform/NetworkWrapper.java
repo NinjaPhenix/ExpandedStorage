@@ -4,24 +4,17 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.LazyLoadedValue;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import ninjaphenix.expandedstorage.base.internal_api.Utils;
+import ninjaphenix.expandedstorage.base.BaseImpl;
 import ninjaphenix.expandedstorage.base.internal_api.inventory.ContainerMenuFactory;
 
 import java.util.function.Consumer;
 
 public interface NetworkWrapper {
-    /**
-     * Should be private, do not use.
-     */
-    @Deprecated
-    LazyLoadedValue<NetworkWrapper> instance = new LazyLoadedValue<>(() -> Utils.getClassInstance(NetworkWrapper.class, "ninjaphenix.expandedstorage.base.platform", "NetworkWrapperImpl"));
-
     static NetworkWrapper getInstance() {
-        return instance.get();
+        return BaseImpl.getInstance().getNetworkWrapper();
     }
 
     void initialise();

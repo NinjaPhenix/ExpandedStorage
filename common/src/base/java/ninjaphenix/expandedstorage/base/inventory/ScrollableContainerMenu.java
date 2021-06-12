@@ -32,7 +32,7 @@ public final class ScrollableContainerMenu extends AbstractContainerMenu_<Scroll
     // @formatter:on
 
     public ScrollableContainerMenu(int windowId, BlockPos pos, Container container, Inventory inventory, Component displayName) {
-        super(BaseCommon.SCROLL_MENU_TYPE, windowId, pos, container, inventory, displayName,
+        super(BaseCommon.SCROLL_MENU_TYPE.get(), windowId, pos, container, inventory, displayName,
                 AbstractContainerMenu_.getNearestScreenMeta(container.getContainerSize(), ScrollableContainerMenu.SIZES));
         for (int i = 0; i < container.getContainerSize(); i++) {
             int slotXPos = i % screenMeta.width;

@@ -18,11 +18,11 @@ import java.util.List;
 public final class Main implements ModInitializer {
     @Override
     public void onInitialize() {
-        BaseCommon.initialize();
+        BaseCommon.initialize("fabric");
         if (PlatformUtils.getInstance().isClient()) {
-            ScreenRegistry.register(BaseCommon.SCROLL_MENU_TYPE, ScrollableScreen::new);
-            ScreenRegistry.register(BaseCommon.PAGE_MENU_TYPE, PagedScreen::new);
-            ScreenRegistry.register(BaseCommon.SINGLE_MENU_TYPE, SingleScreen::new);
+            ScreenRegistry.register(BaseCommon.SCROLL_MENU_TYPE.get(), ScrollableScreen::new);
+            ScreenRegistry.register(BaseCommon.PAGE_MENU_TYPE.get(), PagedScreen::new);
+            ScreenRegistry.register(BaseCommon.SINGLE_MENU_TYPE.get(), SingleScreen::new);
         }
         BaseApi.getInstance().getAndClearItems().forEach((id, item) -> Registry.register(Registry.ITEM, id, item));
 

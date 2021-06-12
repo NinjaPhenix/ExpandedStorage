@@ -29,7 +29,7 @@ public final class SingleContainerMenu extends AbstractContainerMenu_<SingleScre
     // @formatter:on
 
     public SingleContainerMenu(int windowId, BlockPos pos, Container container, Inventory playerInventory, Component displayName) {
-        super(BaseCommon.SINGLE_MENU_TYPE, windowId, pos, container, playerInventory, displayName,
+        super(BaseCommon.SINGLE_MENU_TYPE.get(), windowId, pos, container, playerInventory, displayName,
                 AbstractContainerMenu_.getNearestScreenMeta(container.getContainerSize(), SingleContainerMenu.SIZES));
         for (int i = 0; i < container.getContainerSize(); i++) {
             int x = i % screenMeta.width;

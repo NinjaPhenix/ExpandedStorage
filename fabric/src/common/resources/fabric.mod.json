@@ -1,9 +1,6 @@
 {
   "schemaVersion": 1,
   "accessWidener": "expandedstorage_base.accessWidener",
-  "breaks": {
-    "quilt_loader": "*"
-  },
   "depends": {
     "fabric": "*",
     "fabricloader": ">=0.7.4",

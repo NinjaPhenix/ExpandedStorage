@@ -3,6 +3,7 @@ package ninjaphenix.expandedstorage.base;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.stats.Stats;
+import net.minecraft.util.LazyLoadedValue;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
@@ -12,8 +13,6 @@ import ninjaphenix.expandedstorage.base.inventory.PagedContainerMenu;
 import ninjaphenix.expandedstorage.base.inventory.ScrollableContainerMenu;
 import ninjaphenix.expandedstorage.base.inventory.SingleContainerMenu;
 import ninjaphenix.expandedstorage.base.item.StorageMutator;
-import ninjaphenix.expandedstorage.base.platform.ConfigWrapper;
-import ninjaphenix.expandedstorage.base.platform.NetworkWrapper;
 import ninjaphenix.expandedstorage.base.platform.PlatformUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,22 +20,21 @@ import org.apache.logging.log4j.message.FormattedMessage;
 
 public final class BaseCommon {
     public static final Logger LOGGER = LogManager.getLogger();
-    public static final MenuType<SingleContainerMenu> SINGLE_MENU_TYPE = PlatformUtils.getInstance().createMenuType(Utils.SINGLE_CONTAINER_TYPE, new SingleContainerMenu.Factory());
-    public static final MenuType<PagedContainerMenu> PAGE_MENU_TYPE = PlatformUtils.getInstance().createMenuType(Utils.PAGE_CONTAINER_TYPE, new PagedContainerMenu.Factory());
-    public static final MenuType<ScrollableContainerMenu> SCROLL_MENU_TYPE = PlatformUtils.getInstance().createMenuType(Utils.SCROLL_CONTAINER_TYPE, new ScrollableContainerMenu.Factory());
+    public static final LazyLoadedValue<MenuType<SingleContainerMenu>> SINGLE_MENU_TYPE = new LazyLoadedValue<>(() -> PlatformUtils.getInstance().createMenuType(Utils.SINGLE_CONTAINER_TYPE, new SingleContainerMenu.Factory()));
+    public static final LazyLoadedValue<MenuType<PagedContainerMenu>> PAGE_MENU_TYPE = new LazyLoadedValue<>(() -> PlatformUtils.getInstance().createMenuType(Utils.PAGE_CONTAINER_TYPE, new PagedContainerMenu.Factory()));
+    public static final LazyLoadedValue<MenuType<ScrollableContainerMenu>> SCROLL_MENU_TYPE = new LazyLoadedValue<>(() -> PlatformUtils.getInstance().createMenuType(Utils.SCROLL_CONTAINER_TYPE, new ScrollableContainerMenu.Factory()));
     private static final int ICON_SUITABILITY = 0;
 
     private BaseCommon() {
 
     }
 
-    static void initialize() {
+    static void initialize(String platform) {
+        BaseImpl.getInstance().setWrapperInstances(platform);
         BaseApi.getInstance().offerTabIcon(Items.CHEST, ICON_SUITABILITY);
         BaseApi.getInstance().defineTierUpgradePath(Utils.translation("itemGroup.expandedstorage"), Utils.WOOD_TIER, Utils.IRON_TIER,
                 Utils.GOLD_TIER, Utils.DIAMOND_TIER, Utils.OBSIDIAN_TIER, Utils.NETHERITE_TIER);
         BaseApi.getInstance().register(Utils.resloc("chest_mutator"), new StorageMutator(new Item.Properties().stacksTo(1).tab(Utils.TAB)));
-        ConfigWrapper.getInstance().initialise();
-        NetworkWrapper.getInstance().initialise();
         if (PlatformUtils.getInstance().isClient()) {
             BaseApi.getInstance().registerContainerButtonSettings(Utils.SINGLE_CONTAINER_TYPE,
                     Utils.resloc("textures/gui/single_button.png"),
