@@ -38,18 +38,7 @@ public abstract class LastAfterInitCallbackMixin {
     }
 
     private boolean regionIntersects(AbstractWidget widget, int x, int y, int width, int height) {
-        int wL = widget.x;
-        int wR = wL + widget.getWidth();
-        int wT = widget.y;
-        int wB = wT + widget.getHeight();
-        int bL = x;
-        int bR = bL + width;
-        int bT = y;
-        int bB = bT + height;
-        boolean lI = (bL <= wL && wL <= bR);
-        boolean rI = (bL <= wR && wR <= bR);
-        boolean tI = (bT <= wT && wT <= bB);
-        boolean bI = (bT <= wB && wB <= bB);
-        return lI && tI || rI && tI || lI && bI || rI && bI;
+        return widget.x <= x + width && y <= widget.y + widget.getHeight() ||
+                x <= widget.x + widget.getWidth() && widget.y <= y + height;
     }
 }
