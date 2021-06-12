@@ -2,6 +2,7 @@ package ninjaphenix.expandedstorage.base.client.menu;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
@@ -111,24 +112,8 @@ public final class PagedScreen extends AbstractScreen<PagedContainerMenu, PagedS
         }
     }
 
-    @Override
-    protected void init() {
-        super.init();
-        if (screenMeta.pages != 1) {
-            int pageButtonsXOffset = offset;
-            page = 1;
-            this.setPageText();
-            leftPageButton = new PageButton(leftPos + imageWidth - 61 + pageButtonsXOffset, topPos + imageHeight - 96, 0,
-                    new TranslatableComponent("screen.expandedstorage.prev_page"), button -> this.setPage(page, page - 1),
-                    this::renderButtonTooltip);
-            leftPageButton.active = false;
-            this.addRenderableWidget(leftPageButton);
-            rightPageButton = new PageButton(leftPos + imageWidth - 19 + pageButtonsXOffset, topPos + imageHeight - 96, 1,
-                    new TranslatableComponent("screen.expandedstorage.next_page"), button -> this.setPage(page, page + 1),
-                    this::renderButtonTooltip);
-            this.addRenderableWidget(rightPageButton);
-            pageTextX = (1 + leftPageButton.x + rightPageButton.x - rightPageButton.getWidth() / 2F) / 2F;
-        }
+    public void addRenderingWidget(AbstractWidget widget) {
+        this.addRenderableWidget(widget);
     }
 
     @Override
@@ -176,5 +161,40 @@ public final class PagedScreen extends AbstractScreen<PagedContainerMenu, PagedS
 
     public List<Rect2i> getExclusionZones() {
         return Collections.emptyList();
+    }
+
+    public int getTopPos() {
+        return topPos;
+    }
+
+    public int getLeftPos() {
+        return leftPos;
+    }
+
+    public int getImageWidth() {
+        return imageWidth;
+    }
+
+    public int getImageHeight() {
+        return imageHeight;
+    }
+
+    public void createPageButtons(int x, int y) {
+        page = 1;
+        this.setPageText();
+        leftPageButton = new PageButton(x, y, 0,
+                new TranslatableComponent("screen.expandedstorage.prev_page"), button -> this.setPage(page, page - 1),
+                this::renderButtonTooltip);
+        leftPageButton.active = false;
+        this.addRenderableWidget(leftPageButton);
+        rightPageButton = new PageButton(x + 42, y, 1,
+                new TranslatableComponent("screen.expandedstorage.next_page"), button -> this.setPage(page, page + 1),
+                this::renderButtonTooltip);
+        this.addRenderableWidget(rightPageButton);
+        pageTextX = (1 + leftPageButton.x + rightPageButton.x - rightPageButton.getWidth() / 2F) / 2F;
+    }
+
+    public boolean hasPages() {
+        return screenMeta.pages > 1;
     }
 }

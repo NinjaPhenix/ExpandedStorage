@@ -2,7 +2,7 @@
   "required": true,
   "package": "ninjaphenix.expandedstorage.chest.mixin",
   "plugin": "ninjaphenix.expandedstorage.chest.MixinPlugin",
-  "compatibilityLevel": "JAVA_8",
+  "compatibilityLevel": "JAVA_16",
   "mixins": [
     "ToweletteSupport"
   ],
