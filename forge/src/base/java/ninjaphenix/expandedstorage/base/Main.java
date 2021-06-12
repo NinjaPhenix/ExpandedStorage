@@ -28,7 +28,7 @@ import java.util.Set;
 @Mod("expandedstorage")
 public final class Main {
     public Main() {
-        BaseCommon.initialize();
+        BaseCommon.initialize("forge");
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         modEventBus.addGenericListener(Item.class, (RegistryEvent.Register<Item> event) -> {
             IForgeRegistry<Item> registry = event.getRegistry();
@@ -36,12 +36,12 @@ public final class Main {
         });
         modEventBus.addGenericListener(MenuType.class, (RegistryEvent.Register<MenuType<?>> event) -> {
             IForgeRegistry<MenuType<?>> registry = event.getRegistry();
-            registry.registerAll(BaseCommon.SINGLE_MENU_TYPE, BaseCommon.PAGE_MENU_TYPE, BaseCommon.SCROLL_MENU_TYPE);
+            registry.registerAll(BaseCommon.SINGLE_MENU_TYPE.get(), BaseCommon.PAGE_MENU_TYPE.get(), BaseCommon.SCROLL_MENU_TYPE.get());
         });
         modEventBus.addListener((FMLClientSetupEvent event) -> {
-            MenuScreens.register(BaseCommon.SINGLE_MENU_TYPE, SingleScreen::new);
-            MenuScreens.register(BaseCommon.PAGE_MENU_TYPE, PagedScreen::new);
-            MenuScreens.register(BaseCommon.SCROLL_MENU_TYPE, ScrollableScreen::new);
+            MenuScreens.register(BaseCommon.SINGLE_MENU_TYPE.get(), SingleScreen::new);
+            MenuScreens.register(BaseCommon.PAGE_MENU_TYPE.get(), PagedScreen::new);
+            MenuScreens.register(BaseCommon.SCROLL_MENU_TYPE.get(), ScrollableScreen::new);
         });
         if (PlatformUtils.getInstance().isClient()) {
             this.registerConfigGuiHandler();

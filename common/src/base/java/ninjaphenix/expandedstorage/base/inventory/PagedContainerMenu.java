@@ -30,7 +30,7 @@ public final class PagedContainerMenu extends AbstractContainerMenu_<PagedScreen
     // @formatter:on
 
     public PagedContainerMenu(int windowId, BlockPos pos, Container container, Inventory playerInventory, Component displayName) {
-        super(BaseCommon.PAGE_MENU_TYPE, windowId, pos, container, playerInventory, displayName,
+        super(BaseCommon.PAGE_MENU_TYPE.get(), windowId, pos, container, playerInventory, displayName,
                 AbstractContainerMenu_.getNearestScreenMeta(container.getContainerSize(), PagedContainerMenu.SIZES));
         this.resetSlotPositions(true);
         int left = (screenMeta.width * Utils.SLOT_SIZE + 14) / 2 - 80;

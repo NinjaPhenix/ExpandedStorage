@@ -20,12 +20,10 @@ import ninjaphenix.expandedstorage.base.platform.PlatformUtils;
 import org.jetbrains.annotations.ApiStatus.Experimental;
 import org.jetbrains.annotations.ApiStatus.Internal;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 @Internal
@@ -123,36 +121,5 @@ public final class Utils {
         Map<K, V> map = new HashMap<>();
         initialiser.accept(map);
         return Collections.unmodifiableMap(map);
-    }
-
-    public static Optional<String> getPlatform() {
-        String classLoader = Utils.class.getClassLoader().getClass().getName();
-        if ("net.fabricmc.loader.launch.knot.KnotClassLoader".equals(classLoader)) {
-            return Optional.of("fabric");
-        } else if ("cpw.mods.modlauncher.TransformingClassLoader".equals(classLoader)) {
-            return Optional.of("forge");
-        }
-        return Optional.empty();
-    }
-
-    // todo: rework, platform should be supplied from base Main class.
-    public static <T> T getClassInstance(Class<T> interfaceClass, String commonPackagePath, String className) {
-        String platform = Utils.getPlatform().orElseThrow(() -> new IllegalStateException("Unable to find mod-loader."));
-        String fullClassPath = commonPackagePath + "." + platform + "." + className;
-        try {
-            Class<?> clazz = Class.forName(fullClassPath, false, Utils.class.getClassLoader());
-            if (interfaceClass.isAssignableFrom(clazz)) {
-                try {
-                    //noinspection unchecked
-                    return (T) clazz.getMethod("getInstance").invoke(null);
-                } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-                    throw new IllegalStateException("Cannot find, access or call " + fullClassPath + "#getInstance.");
-                }
-            } else {
-                throw new IllegalStateException(fullClassPath + " should be an instance of " + interfaceClass.getName());
-            }
-        } catch (ClassNotFoundException e) {
-            throw new IllegalStateException("No class found " + fullClassPath + ".");
-        }
     }
 }
