@@ -2,7 +2,6 @@ package ninjaphenix.expandedstorage.base.client.menu;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
@@ -110,10 +109,6 @@ public final class PagedScreen extends AbstractScreen<PagedContainerMenu, PagedS
             leftPageButton.renderTooltip(stack, mouseX, mouseY);
             rightPageButton.renderTooltip(stack, mouseX, mouseY);
         }
-    }
-
-    public void addRenderingWidget(AbstractWidget widget) {
-        this.addRenderableWidget(widget);
     }
 
     @Override
