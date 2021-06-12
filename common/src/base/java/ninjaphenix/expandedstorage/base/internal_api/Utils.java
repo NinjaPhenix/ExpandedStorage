@@ -153,14 +153,4 @@ public final class Utils {
         initialiser.accept(map);
         return Collections.unmodifiableMap(map);
     }
-
-    public static Optional<String> getPlatform() {
-        String classLoader = Utils.class.getClassLoader().getClass().getName();
-        if ("net.fabricmc.loader.launch.knot.KnotClassLoader".equals(classLoader)) {
-            return Optional.of("fabric");
-        } else if ("cpw.mods.modlauncher.TransformingClassLoader".equals(classLoader)) {
-            return Optional.of("forge");
-        }
-        return Optional.empty();
-    }
 }

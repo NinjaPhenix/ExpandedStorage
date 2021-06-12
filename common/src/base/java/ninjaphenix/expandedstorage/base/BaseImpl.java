@@ -59,7 +59,7 @@ public final class BaseImpl implements BaseApi {
     private <T> T getClassInstance(Class<T> interfaceClass, String platform, String commonPackagePath, String className) {
         String fullClassPath = commonPackagePath + "." + platform + "." + className;
         try {
-            Class<?> clazz = Class.forName(fullClassPath, false, Utils.class.getClassLoader());
+            Class<?> clazz = Class.forName(fullClassPath, false, BaseImpl.class.getClassLoader());
             if (interfaceClass.isAssignableFrom(clazz)) {
                 try {
                     //noinspection unchecked
