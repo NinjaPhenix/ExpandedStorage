@@ -1,11 +1,14 @@
 package ninjaphenix.expandedstorage.base;
 
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.event.GuiScreenEvent;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ExtensionPoint;
@@ -22,6 +25,8 @@ import ninjaphenix.expandedstorage.base.internal_api.BaseApi;
 import ninjaphenix.expandedstorage.base.internal_api.Utils;
 import ninjaphenix.expandedstorage.base.platform.PlatformUtils;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -45,10 +50,31 @@ public final class Main {
         });
         if (PlatformUtils.getInstance().isClient()) {
             this.registerConfigGuiHandler();
+            MinecraftForge.EVENT_BUS.addListener((GuiScreenEvent.InitGuiEvent.Post event) -> {
+                if (event.getGui() instanceof PagedScreen screen) {
+                    int width = 54;
+                    int x = screen.getLeftPos() + screen.getImageWidth() - 61;
+                    int originalX = x;
+                    int y = screen.getTopPos() + screen.getImageHeight() - 96;
+                    var renderableChildren = new ArrayList<>(event.getWidgetList());
+                    renderableChildren.sort(Comparator.comparingInt(a -> -a.x));
+                    for (var widget : renderableChildren) {
+                        if (this.regionIntersects(widget, x, y, width, 12)) {
+                            x = widget.x - width - 2;
+                        }
+                    }
+                    screen.createPageButtons(x == originalX, x, y);
+                }
+            });
         }
         new ninjaphenix.expandedstorage.barrel.Main();
         new ninjaphenix.expandedstorage.chest.Main();
         new ninjaphenix.expandedstorage.old_chest.Main();
+    }
+
+    private boolean regionIntersects(AbstractWidget widget, int x, int y, int width, int height) {
+        return widget.x <= x + width && y <= widget.y + widget.getHeight() ||
+                x <= widget.x + widget.getWidth() && widget.y <= y + height;
     }
 
     @OnlyIn(Dist.CLIENT)
