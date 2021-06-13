@@ -174,9 +174,13 @@ public final class PagedScreen extends AbstractScreen<PagedContainerMenu, PagedS
         return imageHeight;
     }
 
-    public void createPageButtons(int x, int y) {
+    public void createPageButtons(boolean isDefault, int x, int y) {
         page = 1;
         this.setPageText();
+        // Honestly this is dumb.
+        if (isDefault && PlatformUtils.getInstance().isModLoaded("inventoryprofiles")) {
+            x -= 14;
+        }
         leftPageButton = new PageButton(x, y, 0,
                 new TranslatableComponent("screen.expandedstorage.prev_page"), button -> this.setPage(page, page - 1),
                 this::renderButtonTooltip);

@@ -20,6 +20,7 @@ public abstract class LastAfterInitCallbackMixin {
             screen.children().forEach(System.out::println);
             int width = 54;
             int x = screen.getLeftPos() + screen.getImageWidth() - 61;
+            int originalX = x;
             int y = screen.getTopPos() + screen.getImageHeight() - 96;
             var renderableChildren = new ArrayList<AbstractWidget>();
             for (var widget : screen.children()) {
@@ -33,7 +34,7 @@ public abstract class LastAfterInitCallbackMixin {
                     x = widget.x - width - 2;
                 }
             }
-            screen.createPageButtons(x, y);
+            screen.createPageButtons(x == originalX, x, y);
         }
     }
 

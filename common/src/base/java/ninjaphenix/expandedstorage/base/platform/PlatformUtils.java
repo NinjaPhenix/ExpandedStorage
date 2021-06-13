@@ -35,4 +35,6 @@ public interface PlatformUtils {
     Set<String> getLoadedModIds();
 
     <T extends BlockEntity> BlockEntityType<T> createBlockEntityType(BiFunction<BlockPos, BlockState, T> blockEntitySupplier, Set<Block> blocks, Type<?> type);
+
+    boolean isModLoaded(String modId);
 }
