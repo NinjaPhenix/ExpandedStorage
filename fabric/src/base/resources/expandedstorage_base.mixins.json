@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "ninjaphenix.expandedstorage.base.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "client": [
+    "LastAfterInitCallbackMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "minVersion": "0.8"
+}
