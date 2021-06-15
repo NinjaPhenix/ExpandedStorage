@@ -1,0 +1,114 @@
+plugins {
+    id 'dev.architectury.loom' version '0.8.0-SNAPSHOT' apply false
+    id 'java'
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'dev.architectury.loom'
+
+    sourceCompatibility = JavaVersion.toVersion(rootProject.mod_java_version)
+    targetCompatibility = JavaVersion.toVersion(rootProject.mod_java_version)
+
+    buildDir = rootDir.absolutePath + "/build/$project.name"
+    archivesBaseName = rootProject.archives_base_name
+    version = rootProject.mod_version
+    group = rootProject.maven_group
+
+    sourceSets {
+        main {
+            java {
+                srcDirs([
+                        "src/barrel/java",
+                        "src/base/java",
+                        "src/chest/java",
+                        "src/old_chest/java",
+                        rootDir.toPath().resolve("common/src/barrel/java"),
+                        rootDir.toPath().resolve("common/src/base/java"),
+                        rootDir.toPath().resolve("common/src/chest/java"),
+                        rootDir.toPath().resolve("common/src/old_chest/java")
+                ])
+            }
+            resources {
+                srcDirs([
+                        "src/barrel/resources",
+                        "src/base/resources",
+                        "src/chest/resources",
+                        "src/old_chest/resources",
+                        "src/common/resources",
+                        rootDir.toPath().resolve("common/src/barrel/resources"),
+                        rootDir.toPath().resolve("common/src/base/resources"),
+                        rootDir.toPath().resolve("common/src/chest/resources"),
+                        rootDir.toPath().resolve("common/src/old_chest/resources"),
+                        rootDir.toPath().resolve("common/src/common/resources"),
+                        rootDir.toPath().resolve("common/src/chest_compat/resources")
+                ])
+            }
+        }
+    }
+
+    loom {
+        silentMojangMappingsLicense()
+        useFabricMixin = true
+    }
+
+    repositories {
+        mavenLocal()
+    }
+
+    dependencies {
+        annotationProcessor('com.github.bsideup.jabel:jabel-javac-plugin:0.4.0')
+        compileOnly('com.github.bsideup.jabel:jabel-javac-plugin:0.4.0')
+
+        minecraft("com.mojang:minecraft:${rootProject.minecraft_version}")
+        mappings loom.officialMojangMappings()
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+        if (System.getenv('I_HATE_INTELLIJ_AND_GRADLE')) {
+            options.release.set(rootProject.minecraft_java_version as int)
+        }
+    }
+
+    remapJar {
+        archiveFileName = "$archivesBaseName-$mod_version+$minecraft_version-fat.jar"
+    }
+
+    jar {
+        archiveFileName = "$archivesBaseName-$mod_version+$minecraft_version-dev.jar"
+    }
+
+    task minJar(type: Jar) {
+        dependsOn(tasks.remapJar)
+        def inputs = zipTree(remapJar.outputs.files.singleFile)
+        from inputs
+        archiveFileName = "$archivesBaseName-$mod_version+${minecraft_version}.jar"
+        def transformer = new Transformer<String, String>() {
+            def lines = new StringBuilder()
+            int openBrackets = 0
+            def slurper = Class.forName('groovy.json.JsonSlurper').getDeclaredConstructor().newInstance()
+            def toJson = Class.forName('groovy.json.JsonOutput').getDeclaredMethod('toJson', Map.class)
+            @Override
+            String transform(String line) {
+                if (line != "") {
+                    affectOpenBrackets(line)
+                    lines.append(line)
+                    if (openBrackets == 0) {
+                        var json = lines.toString()
+                        lines = new StringBuilder()
+                        return toJson.invoke(null, slurper.parseText(json))
+                    }
+                }
+                return null
+            }
+
+            void affectOpenBrackets(String line) {
+                openBrackets += line.count('{') - line.count('}')
+            }
+        }
+        filesMatching(['**/*.json', '**/*.mcmeta']) {
+            it.filter(transformer)
+        }
+    }
+}

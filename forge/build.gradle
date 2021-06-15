@@ -1,101 +1,13 @@
-plugins {
-    id 'dev.architectury.loom' version '0.8.0-SNAPSHOT'
-    id 'java'
-}
-
-// <editor-fold desc="# Common Build Logic">
-def MINECRAFT_JAVA_VERSION = JavaLanguageVersion.of(rootProject.properties.minecraft_java_version as int)
-def MOD_JAVA_VERSION = JavaLanguageVersion.of(rootProject.properties.mod_java_version as int)
-
-sourceCompatibility = JavaVersion.toVersion(MOD_JAVA_VERSION.asInt())
-targetCompatibility = JavaVersion.toVersion(MOD_JAVA_VERSION.asInt())
-
-buildDir = rootProject.projectDir.absolutePath + "/build/$project.name"
-archivesBaseName = rootProject.archives_base_name
-version = rootProject.mod_version
-group = rootProject.maven_group
-
-// MIT License, Copyright 2021 shedaniel (https://github.com/shedaniel)
-// https://github.com/shedaniel/cloth-config-lite/blob/615f6ed8ebebb8cb973d4901565558ddc486e44c/build.gradle#L52-L57
-// Saves a few kilobytes, json can always be pretty printed after the fact.
-processResources {
-    doLast {
-        //noinspection SpellCheckingInspection
-        def slurper = Class.forName('groovy.json.JsonSlurper').getDeclaredConstructor().newInstance()
-        def toJson = Class.forName('groovy.json.JsonOutput').getDeclaredMethod('toJson', Map.class)
-        //noinspection GrUnresolvedAccess
-        fileTree(dir: outputs.files.asPath, include: '**/*.json').each {
-            File file ->
-                {
-                    file.text = toJson.invoke(null, slurper.parse(file))
-                }
-        }
-    }
-}
-
-repositories {
-    mavenLocal()
-}
-
-dependencies {
-    annotationProcessor('com.github.bsideup.jabel:jabel-javac-plugin:0.4.0')
-    compileOnly('com.github.bsideup.jabel:jabel-javac-plugin:0.4.0')
-}
-
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8'
-    if (System.getenv('I_HATE_INTELLIJ_AND_GRADLE')) {
-        options.release.set(MINECRAFT_JAVA_VERSION.asInt())
-    }
-}
-
-// </editor-fold>
-
-sourceSets {
-    main {
-        java {
-            srcDirs([
-                    "src/barrel/java",
-                    "src/base/java",
-                    "src/chest/java",
-                    "src/old_chest/java",
-                    rootDir.toPath().resolve("common/src/barrel/java"),
-                    rootDir.toPath().resolve("common/src/base/java"),
-                    rootDir.toPath().resolve("common/src/chest/java"),
-                    rootDir.toPath().resolve("common/src/old_chest/java")
-            ])
-        }
-        resources {
-            srcDirs([
-                    "src/barrel/resources",
-                    "src/base/resources",
-                    "src/chest/resources",
-                    "src/old_chest/resources",
-                    "src/common/resources",
-                    rootDir.toPath().resolve("common/src/barrel/resources"),
-                    rootDir.toPath().resolve("common/src/base/resources"),
-                    rootDir.toPath().resolve("common/src/chest/resources"),
-                    rootDir.toPath().resolve("common/src/old_chest/resources"),
-                    rootDir.toPath().resolve("common/src/common/resources"),
-                    rootDir.toPath().resolve("common/src/chest_compat/resources")
-            ])
-        }
-    }
-}
-
 loom {
-    silentMojangMappingsLicense()
-    useFabricMixin = true
-
     runs {
         client {
-            vmArgs(['--add-exports=java.base/sun.security.util=ALL-UNNAMED',
-                    '--add-opens=java.base/java.util.jar=ALL-UNNAMED'])
+            vmArgs('--add-exports=java.base/sun.security.util=ALL-UNNAMED',
+                    '--add-opens=java.base/java.util.jar=ALL-UNNAMED')
         }
 
         server {
-            vmArgs(['--add-exports=java.base/sun.security.util=ALL-UNNAMED',
-                    '--add-opens=java.base/java.util.jar=ALL-UNNAMED'])
+            vmArgs('--add-exports=java.base/sun.security.util=ALL-UNNAMED',
+                    '--add-opens=java.base/java.util.jar=ALL-UNNAMED')
         }
     }
 }
@@ -114,14 +26,11 @@ repositories {
 }
 
 dependencies {
-    minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
-    mappings loom.officialMojangMappings()
+    forge("net.minecraftforge:forge:${rootProject.minecraft_version}-${rootProject.forge_version}")
 
-    forge "net.minecraftforge:forge:${rootProject.minecraft_version}-${rootProject.forge_version}"
-
-    // For all modules
-    modCompileOnly "mezz.jei:jei-${rootProject.minecraft_version}:${project.jei_version}:api"
-    modRuntime "mezz.jei:jei-${rootProject.minecraft_version}:${project.jei_version}"
+    // For base module
+    modCompileOnly("mezz.jei:jei-${rootProject.minecraft_version}:${project.jei_version}:api")
+    modRuntime("mezz.jei:jei-${rootProject.minecraft_version}:${project.jei_version}")
 }
 
 processResources {
@@ -132,17 +41,3 @@ processResources {
         expand props
     }
 }
-
-remapJar {
-    archiveVersion = mod_version + '+' + minecraft_version // Feels hacky but works.
-}
-
-jar {
-    classifier 'dev-' + minecraft_version
-}
-
-//sourcesJar {
-//    def commonSources = project(':common').sourcesJar
-//    dependsOn commonSources
-//    from commonSources.archiveFile.map { zipTree(it) }
-//}

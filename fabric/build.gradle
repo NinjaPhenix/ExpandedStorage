@@ -1,105 +1,19 @@
-plugins {
-    id 'dev.architectury.loom' version '0.8.0-SNAPSHOT'
-    id 'java'
-}
-
-// <editor-fold desc="# Common Build Logic">
-def MINECRAFT_JAVA_VERSION = JavaLanguageVersion.of(rootProject.properties.minecraft_java_version as int)
-def MOD_JAVA_VERSION = JavaLanguageVersion.of(rootProject.properties.mod_java_version as int)
-
-sourceCompatibility = JavaVersion.toVersion(MOD_JAVA_VERSION.asInt())
-targetCompatibility = JavaVersion.toVersion(MOD_JAVA_VERSION.asInt())
-
-buildDir = rootProject.projectDir.absolutePath + "/build/$project.name"
-archivesBaseName = rootProject.archives_base_name
-version = rootProject.mod_version
-group = rootProject.maven_group
-
-// MIT License, Copyright 2021 shedaniel (https://github.com/shedaniel)
-// https://github.com/shedaniel/cloth-config-lite/blob/615f6ed8ebebb8cb973d4901565558ddc486e44c/build.gradle#L52-L57
-// Saves a few kilobytes, json can always be pretty printed after the fact.
-processResources {
-    doLast {
-        //noinspection SpellCheckingInspection
-        def slurper = Class.forName('groovy.json.JsonSlurper').getDeclaredConstructor().newInstance()
-        def toJson = Class.forName('groovy.json.JsonOutput').getDeclaredMethod('toJson', Map.class)
-        //noinspection GrUnresolvedAccess
-        fileTree(dir: outputs.files.asPath, include: '**/*.json').each {
-            File file ->
-                {
-                    file.text = toJson.invoke(null, slurper.parse(file))
-                }
-        }
-    }
-}
-
-repositories {
-    mavenLocal()
-}
-
-dependencies {
-    annotationProcessor('com.github.bsideup.jabel:jabel-javac-plugin:0.4.0')
-    compileOnly('com.github.bsideup.jabel:jabel-javac-plugin:0.4.0')
-}
-
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8'
-    if (System.getenv('I_HATE_INTELLIJ_AND_GRADLE')) {
-        options.release.set(MINECRAFT_JAVA_VERSION.asInt())
-    }
-}
-
-// </editor-fold>
-
 tasks.withType(JavaExec).configureEach {
     javaLauncher.set(javaToolchains.launcherFor {
-        it.languageVersion = JavaLanguageVersion.of(MINECRAFT_JAVA_VERSION.asInt())
+        it.languageVersion = JavaLanguageVersion.of(rootProject.minecraft_java_version)
     })
 }
 
-sourceSets {
-    main {
-        java {
-            srcDirs([
-                    "src/barrel/java",
-                    "src/base/java",
-                    "src/chest/java",
-                    "src/old_chest/java",
-                    rootDir.toPath().resolve("common/src/barrel/java"),
-                    rootDir.toPath().resolve("common/src/base/java"),
-                    rootDir.toPath().resolve("common/src/chest/java"),
-                    rootDir.toPath().resolve("common/src/old_chest/java")])
-        }
-        resources {
-            srcDirs([
-                    "src/barrel/resources",
-                    "src/base/resources",
-                    "src/chest/resources",
-                    "src/old_chest/resources",
-                    "src/common/resources",
-                    rootDir.toPath().resolve("common/src/barrel/resources"),
-                    rootDir.toPath().resolve("common/src/base/resources"),
-                    rootDir.toPath().resolve("common/src/chest/resources"),
-                    rootDir.toPath().resolve("common/src/old_chest/resources"),
-                    rootDir.toPath().resolve("common/src/common/resources"),
-                    rootDir.toPath().resolve("common/src/chest_compat/resources")
-            ])
-        }
-    }
-}
-
 loom {
-    silentMojangMappingsLicense()
-    useFabricMixin = true
     accessWidener = file('src/base/resources/expandedstorage_base.accessWidener')
 
     runs {
         client {
-            vmArgs.add('-XX:+IgnoreUnrecognizedVMOptions')
+            vmArgs('-XX:+IgnoreUnrecognizedVMOptions')
         }
 
         server {
-            vmArgs.add('-XX:+IgnoreUnrecognizedVMOptions')
+            vmArgs('-XX:+IgnoreUnrecognizedVMOptions')
         }
     }
 }
@@ -122,30 +36,24 @@ repositories {
     }
 }
 
-dependencies {
-    minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
-    mappings loom.officialMojangMappings()
+// todo: how to fix intellij "errors"
+def excludeFabric = {
+    exclude group: 'net.fabricmc'
+}
 
-    modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
-    modApi "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
+dependencies {
+    modImplementation("net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}")
+    modApi("net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}")
 
     // For chest module
-    modCompileOnly('com.github.Virtuoel:Statement:31a2c3f') {
-        exclude group: 'net.fabricmc'
-    }
-    modCompileOnly('com.github.Virtuoel:Towelette:e5e39eb') {
-        exclude group: 'net.fabricmc'
-    }
+    modCompileOnly('com.github.Virtuoel:Statement:31a2c3f', excludeFabric)
+    modCompileOnly('com.github.Virtuoel:Towelette:e5e39eb', excludeFabric)
 
-    // For all modules
-    modCompileOnly("me.shedaniel:RoughlyEnoughItems:${project.rei_version}") {
-        exclude group: 'net.fabricmc'
-    }
+    // For base module
+    modCompileOnly("me.shedaniel:RoughlyEnoughItems:${project.rei_version}", excludeFabric)
     modRuntime("me.shedaniel:RoughlyEnoughItems:${project.rei_version}")
 
-    modCompileOnly("com.terraformersmc:modmenu:${project.modmenu_version}") {
-        exclude group: 'net.fabricmc'
-    }
+    modCompileOnly("com.terraformersmc:modmenu:${project.modmenu_version}", excludeFabric)
     modRuntime("com.terraformersmc:modmenu:${project.modmenu_version}")
 }
 
@@ -156,12 +64,4 @@ processResources {
     filesMatching('fabric.mod.json') {
         expand props
     }
-}
-
-remapJar {
-    archiveVersion = mod_version + '+' + minecraft_version // Feels hacky but works.
-}
-
-jar {
-    classifier 'dev-' + minecraft_version
 }
