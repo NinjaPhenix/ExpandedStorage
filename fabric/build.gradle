@@ -64,7 +64,11 @@ sourceSets {
                     "src/barrel/java",
                     "src/base/java",
                     "src/chest/java",
-                    "src/old_chest/java"])
+                    "src/old_chest/java",
+                    rootDir.toPath().resolve("common/src/barrel/java"),
+                    rootDir.toPath().resolve("common/src/base/java"),
+                    rootDir.toPath().resolve("common/src/chest/java"),
+                    rootDir.toPath().resolve("common/src/old_chest/java")])
         }
         resources {
             srcDirs([
@@ -72,7 +76,13 @@ sourceSets {
                     "src/base/resources",
                     "src/chest/resources",
                     "src/old_chest/resources",
-                    "src/common/resources"
+                    "src/common/resources",
+                    rootDir.toPath().resolve("common/src/barrel/resources"),
+                    rootDir.toPath().resolve("common/src/base/resources"),
+                    rootDir.toPath().resolve("common/src/chest/resources"),
+                    rootDir.toPath().resolve("common/src/old_chest/resources"),
+                    rootDir.toPath().resolve("common/src/common/resources"),
+                    rootDir.toPath().resolve("common/src/chest_compat/resources")
             ])
         }
     }
