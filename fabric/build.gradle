@@ -1,5 +1,5 @@
 plugins {
-    id 'dev.architectury.loom' // Must be before architectury-plugin
+    id 'dev.architectury.loom' version '0.8.0-SNAPSHOT'
     id 'java'
 }
 
@@ -78,11 +78,6 @@ sourceSets {
     }
 }
 
-architectury {
-    fabric()
-    injectInjectables = false
-}
-
 loom {
     silentMojangMappingsLicense()
     useFabricMixin = true
@@ -97,10 +92,6 @@ loom {
             vmArgs.add('-XX:+IgnoreUnrecognizedVMOptions')
         }
     }
-}
-
-configurations {
-    shadowCommon // Don't use shadow from the shadow plugin because we don't want IDEA to index this.
 }
 
 repositories {
@@ -146,16 +137,6 @@ dependencies {
         exclude group: 'net.fabricmc'
     }
     modRuntime("com.terraformersmc:modmenu:${project.modmenu_version}")
-
-    implementation(project(path: ':common')) {
-        transitive = false
-    }
-    developmentFabric(project(path: ':common')) {
-        transitive = false
-    }
-    shadowCommon(project(path: ':common', configuration: 'transformProductionFabric')) {
-        transitive = false
-    }
 }
 
 processResources {
@@ -167,23 +148,10 @@ processResources {
     }
 }
 
-shadowJar {
-    configurations = [project.configurations.shadowCommon]
-    classifier 'dev-shadow-' + minecraft_version
-}
-
 remapJar {
-    input.set shadowJar.archiveFile
-    dependsOn shadowJar
     archiveVersion = mod_version + '+' + minecraft_version // Feels hacky but works.
 }
 
 jar {
     classifier 'dev-' + minecraft_version
 }
-
-//sourcesJar {
-//    def commonSources = project(':common').sourcesJar
-//    dependsOn commonSources
-//    from commonSources.archiveFile.map { zipTree(it) } duplicatesStrategy(DuplicatesStrategy.WARN)
-//}
