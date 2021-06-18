@@ -260,21 +260,21 @@ public class StorageMutator extends Item {
                     player.getCooldowns().addCooldown(this, Utils.QUARTER_SECOND);
                     return InteractionResult.SUCCESS;
                 } else if (state.hasProperty(HORIZONTAL_FACING)) {
-                    if (block instanceof ChestBlock) {
+                    if (block instanceof AbstractChestBlock) {
                         if (!level.isClientSide()) {
-                            switch (state.getValue(ChestBlock.CURSED_CHEST_TYPE)) {
+                            switch (state.getValue(AbstractChestBlock.CURSED_CHEST_TYPE)) {
                                 case SINGLE -> level.setBlockAndUpdate(pos, state.rotate(CLOCKWISE_90));
                                 case TOP, BOTTOM -> {
                                     level.setBlockAndUpdate(pos, state.rotate(CLOCKWISE_90));
-                                    BlockPos otherPos = pos.relative(ChestBlock.getDirectionToAttached(state));
+                                    BlockPos otherPos = pos.relative(AbstractChestBlock.getDirectionToAttached(state));
                                     BlockState otherState = level.getBlockState(otherPos);
                                     level.setBlockAndUpdate(otherPos, otherState.rotate(CLOCKWISE_90));
                                 }
                                 case FRONT, BACK, LEFT, RIGHT -> {
-                                    level.setBlockAndUpdate(pos, state.rotate(CLOCKWISE_180).setValue(ChestBlock.CURSED_CHEST_TYPE, state.getValue(ChestBlock.CURSED_CHEST_TYPE).getOpposite()));
-                                    BlockPos otherPos = pos.relative(ChestBlock.getDirectionToAttached(state));
+                                    level.setBlockAndUpdate(pos, state.rotate(CLOCKWISE_180).setValue(AbstractChestBlock.CURSED_CHEST_TYPE, state.getValue(AbstractChestBlock.CURSED_CHEST_TYPE).getOpposite()));
+                                    BlockPos otherPos = pos.relative(AbstractChestBlock.getDirectionToAttached(state));
                                     BlockState otherState = level.getBlockState(otherPos);
-                                    level.setBlockAndUpdate(otherPos, otherState.rotate(CLOCKWISE_180).setValue(ChestBlock.CURSED_CHEST_TYPE, otherState.getValue(ChestBlock.CURSED_CHEST_TYPE).getOpposite()));
+                                    level.setBlockAndUpdate(otherPos, otherState.rotate(CLOCKWISE_180).setValue(AbstractChestBlock.CURSED_CHEST_TYPE, otherState.getValue(AbstractChestBlock.CURSED_CHEST_TYPE).getOpposite()));
                                 }
                             }
                         }
