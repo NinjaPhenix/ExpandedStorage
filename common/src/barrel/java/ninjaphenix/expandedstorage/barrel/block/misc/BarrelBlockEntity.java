@@ -37,28 +37,28 @@ public class BarrelBlockEntity extends AbstractOpenableStorageBlockEntity {
         }
     }
 
-    @Override
-    public void startOpen(Player player) {
-        if (!player.isSpectator()) {
-            if (viewerCount < 0) {
-                viewerCount = 0;
-            }
-            ++viewerCount;
-            BlockState state = this.getBlockState();
-            if (!state.getValue(BlockStateProperties.OPEN)) {
-                this.playSound(state, SoundEvents.BARREL_OPEN);
-                this.setOpen(state, true);
-            }
-            this.scheduleViewCountCheck();
-        }
-    }
+    //@Override
+    //public void startOpen(Player player) {
+    //    if (!player.isSpectator()) {
+    //        if (viewerCount < 0) {
+    //            viewerCount = 0;
+    //        }
+    //        ++viewerCount;
+    //        BlockState state = this.getBlockState();
+    //        if (!state.getValue(BlockStateProperties.OPEN)) {
+    //            this.playSound(state, SoundEvents.BARREL_OPEN);
+    //            this.setOpen(state, true);
+    //        }
+    //        this.scheduleViewCountCheck();
+    //    }
+    //}
 
-    @Override
-    public void stopOpen(Player player) {
-        if (!player.isSpectator()) {
-            --viewerCount;
-        }
-    }
+    //@Override
+    //public void stopOpen(Player player) {
+    //    if (!player.isSpectator()) {
+    //        --viewerCount;
+    //    }
+    //}
 
     private void setOpen(BlockState state, boolean open) {
         //noinspection ConstantConditions

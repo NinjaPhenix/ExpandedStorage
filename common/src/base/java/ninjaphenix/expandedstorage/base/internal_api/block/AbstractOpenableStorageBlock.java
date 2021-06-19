@@ -36,7 +36,7 @@ import java.util.List;
 
 @Internal
 @Experimental
-public abstract class AbstractOpenableStorageBlock extends AbstractStorageBlock implements EntityBlock, WorldlyContainerHolder {
+public abstract class AbstractOpenableStorageBlock extends AbstractStorageBlock {
     private final ResourceLocation openStat;
     private final int slots;
 
@@ -53,6 +53,11 @@ public abstract class AbstractOpenableStorageBlock extends AbstractStorageBlock 
 
     public final Component getContainerName() {
         return new TranslatableComponent(this.getDescriptionId());
+    }
+
+    @Override
+    public boolean hasTileEntity(BlockState state) {
+        return true;
     }
 
     @Override
@@ -83,7 +88,7 @@ public abstract class AbstractOpenableStorageBlock extends AbstractStorageBlock 
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean bl) {
         if (!state.is(newState.getBlock())) {
             if (level.getBlockEntity(pos) instanceof AbstractOpenableStorageBlockEntity entity) {
-                Containers.dropContents(level, pos, entity);
+                Containers.dropContents(level, pos, entity.getItems());
                 level.updateNeighbourForOutputSignal(pos, this);
             }
             super.onRemove(state, level, pos, newState, bl);
@@ -97,7 +102,7 @@ public abstract class AbstractOpenableStorageBlock extends AbstractStorageBlock 
         return new ContainerMenuFactory() {
             @Override
             public void writeClientData(ServerPlayer player, FriendlyByteBuf buffer) {
-                buffer.writeBlockPos(pos).writeInt(container.getContainerSize());
+                buffer.writeBlockPos(pos).writeInt(container.getItemCount());
             }
 
             @Override
@@ -116,19 +121,11 @@ public abstract class AbstractOpenableStorageBlock extends AbstractStorageBlock 
 
             @Override
             public AbstractContainerMenu createMenu(int windowId, Inventory playerInventory, Player player) {
-                if (container.canPlayerInteractWith(player) && container.stillValid(player)) {
+                if (container.canPlayerInteractWith(player) && container.canContinueUse(player)) {
                     return NetworkWrapper.getInstance().createMenu(windowId, container.getBlockPos(), container, playerInventory, this.displayName());
                 }
                 return null;
             }
         };
-    }
-
-    @Override // Keep for hoppers.
-    public WorldlyContainer getContainer(BlockState state, LevelAccessor level, BlockPos pos) {
-        if (level.getBlockEntity(pos) instanceof AbstractOpenableStorageBlockEntity entity) {
-            return entity;
-        }
-        return null;
     }
 }

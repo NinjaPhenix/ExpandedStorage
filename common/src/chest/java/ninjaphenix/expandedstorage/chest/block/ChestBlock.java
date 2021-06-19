@@ -24,6 +24,7 @@ import ninjaphenix.expandedstorage.base.internal_api.block.misc.CursedChestType;
 import ninjaphenix.expandedstorage.chest.ChestCommon;
 import ninjaphenix.expandedstorage.chest.block.misc.ChestBlockEntity;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public final class ChestBlock extends AbstractChestBlock<ChestBlockEntity> implements SimpleWaterloggedBlock {
     public static final int SET_OPEN_COUNT_EVENT = 1;
@@ -93,7 +94,7 @@ public final class ChestBlock extends AbstractChestBlock<ChestBlockEntity> imple
 
     @NotNull
     @Override
-    public BlockEntity newBlockEntity(BlockGetter getter) {
+    public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
         return new ChestBlockEntity(ChestCommon.getBlockEntityType(), blockId());
     }
 

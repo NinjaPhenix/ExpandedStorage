@@ -41,31 +41,13 @@ import java.util.function.BiPredicate;
 @Experimental
 public abstract class AbstractChestBlock<T extends AbstractOpenableStorageBlockEntity> extends AbstractOpenableStorageBlock {
     public static final EnumProperty<CursedChestType> CURSED_CHEST_TYPE = EnumProperty.create("type", CursedChestType.class);
-    private final DoubleBlockCombiner.Combiner<T, Optional<WorldlyContainer>> containerGetter = new DoubleBlockCombiner.Combiner<T, Optional<WorldlyContainer>>() {
-        @Override
-        public Optional<WorldlyContainer> acceptDouble(T first, T second) {
-            return Optional.of(new CompoundWorldlyContainer(first, second));
-        }
-
-        @Override
-        public Optional<WorldlyContainer> acceptSingle(T single) {
-            return Optional.of(single);
-        }
-
-        @Override
-        public Optional<WorldlyContainer> acceptNone() {
-            return Optional.empty();
-        }
-    };
-
-    private final DoubleBlockCombiner.Combiner<T, Optional<ContainerMenuFactory>> menuGetter = new DoubleBlockCombiner.Combiner<T, Optional<ContainerMenuFactory>>() {
+    private final DoubleBlockCombiner.Combiner<T, Optional<ContainerMenuFactory>> menuGetter = new DoubleBlockCombiner.Combiner<>() {
         @Override
         public Optional<ContainerMenuFactory> acceptDouble(T first, T second) {
             return Optional.of(new ContainerMenuFactory() {
                 @Override
                 public void writeClientData(ServerPlayer player, FriendlyByteBuf buffer) {
-                    CompoundWorldlyContainer container = new CompoundWorldlyContainer(first, second);
-                    buffer.writeBlockPos(first.getBlockPos()).writeInt(container.getContainerSize());
+                    buffer.writeBlockPos(first.getBlockPos()).writeInt(first.getItemCount() + second.getItemCount());
                 }
 
                 @Override
@@ -84,7 +66,7 @@ public abstract class AbstractChestBlock<T extends AbstractOpenableStorageBlockE
 
                 @Override
                 public AbstractContainerMenu createMenu(int windowId, Inventory playerInventory, Player player) {
-                    if (first.stillValid(player) && second.stillValid(player)) {
+                    if (first.canContinueUse(player) && second.canContinueUse(player)) {
                         CompoundWorldlyContainer container = new CompoundWorldlyContainer(first, second);
                         return NetworkWrapper.getInstance().createMenu(windowId, first.getBlockPos(), container, playerInventory, this.displayName());
                     }
@@ -98,7 +80,7 @@ public abstract class AbstractChestBlock<T extends AbstractOpenableStorageBlockE
             return Optional.of(new ContainerMenuFactory() {
                 @Override
                 public void writeClientData(ServerPlayer player, FriendlyByteBuf buffer) {
-                    buffer.writeBlockPos(single.getBlockPos()).writeInt(single.getContainerSize());
+                    buffer.writeBlockPos(single.getBlockPos()).writeInt(single.getItemCount());
                 }
 
                 @Override
@@ -117,7 +99,7 @@ public abstract class AbstractChestBlock<T extends AbstractOpenableStorageBlockE
 
                 @Override
                 public AbstractContainerMenu createMenu(int windowId, Inventory playerInventory, Player player) {
-                    if (single.stillValid(player)) {
+                    if (single.canContinueUse(player)) {
                         return NetworkWrapper.getInstance().createMenu(windowId, single.getBlockPos(), single, playerInventory, this.displayName());
                     }
                     return null;
@@ -297,10 +279,5 @@ public abstract class AbstractChestBlock<T extends AbstractOpenableStorageBlockE
     @Override
     protected ContainerMenuFactory createContainerFactory(BlockState state, LevelAccessor level, BlockPos pos) {
         return this.combine(state, level, pos, false).apply(menuGetter).orElse(null);
-    }
-
-    @Override // Keep for hoppers.
-    public WorldlyContainer getContainer(BlockState state, LevelAccessor level, BlockPos pos) {
-        return this.combine(state, level, pos, true).apply(containerGetter).orElse(null);
     }
 }

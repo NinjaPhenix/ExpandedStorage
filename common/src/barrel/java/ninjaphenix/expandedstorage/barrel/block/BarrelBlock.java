@@ -16,6 +16,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import ninjaphenix.expandedstorage.barrel.BarrelCommon;
 import ninjaphenix.expandedstorage.barrel.block.misc.BarrelBlockEntity;
 import ninjaphenix.expandedstorage.base.internal_api.block.AbstractOpenableStorageBlock;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
@@ -44,15 +45,10 @@ public final class BarrelBlock extends AbstractOpenableStorageBlock {
         return BarrelCommon.BLOCK_TYPE;
     }
 
+    @NotNull
     @Override
-    public BlockEntity newBlockEntity(BlockGetter blockGetter) {
+    public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
         return new BarrelBlockEntity(BarrelCommon.getBlockEntityType(), this.blockId());
-    }
-
-    @Override
-    public WorldlyContainer getContainer(BlockState state, LevelAccessor level, BlockPos pos) {
-        BlockEntity entity = level.getBlockEntity(pos);
-        return entity == null || entity.getType() != BarrelCommon.getBlockEntityType() ? null : (WorldlyContainer) entity;
     }
 
     @Override
