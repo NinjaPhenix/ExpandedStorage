@@ -6,7 +6,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.CompoundContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -27,7 +27,6 @@ import ninjaphenix.expandedstorage.base.internal_api.Utils;
 import ninjaphenix.expandedstorage.base.internal_api.block.misc.AbstractOpenableStorageBlockEntity;
 import ninjaphenix.expandedstorage.base.internal_api.block.misc.AbstractStorageBlockEntity;
 import ninjaphenix.expandedstorage.base.internal_api.block.misc.CursedChestType;
-import ninjaphenix.expandedstorage.base.internal_api.inventory.CompoundWorldlyContainer;
 import ninjaphenix.expandedstorage.base.internal_api.inventory.ContainerMenuFactory;
 import ninjaphenix.expandedstorage.base.wrappers.NetworkWrapper;
 import org.jetbrains.annotations.ApiStatus.Experimental;
@@ -67,7 +66,7 @@ public abstract class AbstractChestBlock<T extends AbstractOpenableStorageBlockE
                 @Override
                 public AbstractContainerMenu createMenu(int windowId, Inventory playerInventory, Player player) {
                     if (first.canContinueUse(player) && second.canContinueUse(player)) {
-                        CompoundWorldlyContainer container = new CompoundWorldlyContainer(first, second);
+                        CompoundContainer container = new CompoundContainer(first.getContainerWrapper(), second.getContainerWrapper());
                         return NetworkWrapper.getInstance().createMenu(windowId, first.getBlockPos(), container, playerInventory, this.displayName());
                     }
                     return null;
@@ -100,7 +99,7 @@ public abstract class AbstractChestBlock<T extends AbstractOpenableStorageBlockE
                 @Override
                 public AbstractContainerMenu createMenu(int windowId, Inventory playerInventory, Player player) {
                     if (single.canContinueUse(player)) {
-                        return NetworkWrapper.getInstance().createMenu(windowId, single.getBlockPos(), single, playerInventory, this.displayName());
+                        return NetworkWrapper.getInstance().createMenu(windowId, single.getBlockPos(), single.getContainerWrapper(), playerInventory, this.displayName());
                     }
                     return null;
                 }

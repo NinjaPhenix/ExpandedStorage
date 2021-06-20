@@ -27,7 +27,7 @@ public final class ChestBlockEntity extends AbstractOpenableStorageBlockEntity i
 
     private static int tickViewerCount(Level level, ChestBlockEntity entity, int ticksOpen, int x, int y, int z, int viewCount) {
         if (!level.isClientSide() && viewCount != 0 && (ticksOpen + x + y + z) % 200 == 0) {
-            return AbstractOpenableStorageBlockEntity.countViewers(level, entity, x, y, z);
+            return AbstractOpenableStorageBlockEntity.countViewers(level, entity.getContainerWrapper(), x, y, z);
         }
         return viewCount;
     }

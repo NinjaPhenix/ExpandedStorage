@@ -1,11 +1,14 @@
 package ninjaphenix.expandedstorage.base.internal_api.block.misc;
 
+import com.google.common.base.Suppliers;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.CompoundContainer;
+import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Player;
@@ -30,6 +33,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.function.IntUnaryOperator;
+import java.util.function.Supplier;
 
 @Internal
 @Experimental
@@ -40,6 +44,65 @@ public abstract class AbstractOpenableStorageBlockEntity extends AbstractStorage
     private NonNullList<ItemStack> inventory;
     private int[] slotsForFace;
     private LazyOptional<IItemHandler> itemHandler;
+    private final Supplier<Container> container = Suppliers.memoize(() -> new Container() {
+        @Override
+        public int getContainerSize() {
+            return slots;
+        }
+
+        @Override
+        public boolean isEmpty() {
+            for (ItemStack stack : inventory) {
+                if (!stack.isEmpty()) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        @Override
+        public ItemStack getItem(int slot) {
+            return inventory.get(slot);
+        }
+
+        @Override
+        public ItemStack removeItem(int slot, int amount) {
+            ItemStack stack = ContainerHelper.removeItem(inventory, slot, amount);
+            if (!stack.isEmpty()) {
+                this.setChanged();
+            }
+            return stack;
+        }
+
+        @Override
+        public ItemStack removeItemNoUpdate(int slot) {
+            return ContainerHelper.takeItem(inventory, slot);
+        }
+
+        @Override
+        public void setItem(int slot, ItemStack stack) {
+            inventory.set(slot, stack);
+            if (stack.getCount() > this.getMaxStackSize()) {
+                stack.setCount(this.getMaxStackSize());
+            }
+            this.setChanged();
+        }
+
+        @Override
+        public void setChanged() {
+            AbstractOpenableStorageBlockEntity.this.setChanged();
+        }
+
+        @Override
+        public boolean stillValid(Player player) {
+            return AbstractOpenableStorageBlockEntity.this.canContinueUse(player);
+        }
+
+        @Override
+        public void clearContent() {
+            inventory.clear();
+        }
+    });
 
     public AbstractOpenableStorageBlockEntity(BlockEntityType<?> blockEntityType, ResourceLocation blockId) {
         super(blockEntityType);
@@ -49,14 +112,17 @@ public abstract class AbstractOpenableStorageBlockEntity extends AbstractStorage
         }
     }
 
-    protected static int countViewers(Level level, AbstractOpenableStorageBlockEntity container, int x, int y, int z) {
-        //return level.getEntitiesOfClass(Player.class, new AABB(x - 5, y - 5, z - 5, x + 6, y + 6, z + 6)).stream()
-        //            .filter(player -> player.containerMenu instanceof AbstractContainerMenu_<?>)
-        //            .map(player -> ((AbstractContainerMenu_<?>) player.containerMenu).getContainer())
-        //            .filter(openContainer -> openContainer == container ||
-        //                    openContainer instanceof CompoundWorldlyContainer compoundContainer && compoundContainer.consistsPartlyOf(container))
-        //            .mapToInt(inv -> 1).sum();
-        return 0;
+    protected static int countViewers(Level level, Container container, int x, int y, int z) {
+        return level.getEntitiesOfClass(Player.class, new AABB(x - 5, y - 5, z - 5, x + 6, y + 6, z + 6)).stream()
+                    .filter(player -> player.containerMenu instanceof AbstractContainerMenu_<?>)
+                    .map(player -> ((AbstractContainerMenu_<?>) player.containerMenu).getContainer())
+                    .filter(openContainer -> openContainer == container ||
+                            openContainer instanceof CompoundContainer compoundContainer && compoundContainer.contains(container))
+                    .mapToInt(inv -> 1).sum();
+    }
+
+    public Container getContainerWrapper() {
+        return container.get();
     }
 
 
@@ -66,6 +132,7 @@ public abstract class AbstractOpenableStorageBlockEntity extends AbstractStorage
         if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
             if (itemHandler == null) {
                 itemHandler = LazyOptional.of(this::createItemHandler);
+                return itemHandler.cast();
             }
         }
         return super.getCapability(capability, side);
@@ -76,25 +143,25 @@ public abstract class AbstractOpenableStorageBlockEntity extends AbstractStorage
         return new IItemHandler() {
             @Override
             public int getSlots() {
-                return AbstractOpenableStorageBlockEntity.this.slots;
+                return slots;
             }
 
             @NotNull
             @Override
             public ItemStack getStackInSlot(int slot) {
-                return AbstractOpenableStorageBlockEntity.this.inventory.get(slot);
+                return inventory.get(slot);
             }
 
             @NotNull
             @Override
             public ItemStack insertItem(int slot, @NotNull ItemStack item, boolean simulate) {
-                return null;
+                return ItemStack.EMPTY; // todo: implement
             }
 
             @NotNull
             @Override
             public ItemStack extractItem(int slot, int amount, boolean simulate) {
-                return null;
+                return ItemStack.EMPTY; // todo: implement
             }
 
             @Override
@@ -154,63 +221,7 @@ public abstract class AbstractOpenableStorageBlockEntity extends AbstractStorage
         return slots;
     }
 
-    //@Override
-    //public int[] getSlotsForFace(Direction direction) {
-    //    return slotsForFace;
-    //}
-
-    //public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction face) {
-    //    return this.canPlaceItem(slot, stack);
-    //}
-
-    //public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction face) {
-    //    return true;
-    //}
-
-    //@Override
-    //public int getContainerSize() {
-    //    return slots;
-    //}
-
-    //@Override
-    //public boolean isEmpty() {
-    //    return inventory.stream().allMatch(ItemStack::isEmpty);
-    //}
-
-    //@Override
-    //public ItemStack getItem(int slot) {
-    //    return inventory.get(slot);
-    //}
-
-    //@Override
-    //public ItemStack removeItem(int slot, int count) {
-    //    ItemStack stack = ContainerHelper.removeItem(inventory, slot, count);
-    //    if (!stack.isEmpty()) {
-    //        this.setChanged();
-    //    }
-    //    return stack;
-    //}
-
-    //@Override
-    //public ItemStack removeItemNoUpdate(int slot) {
-    //    return ContainerHelper.takeItem(inventory, slot);
-    //}
-
-    //@Override
-    //public void setItem(int slot, ItemStack stack) {
-    //    inventory.set(slot, stack);
-    //    if (stack.getCount() > this.getMaxStackSize()) {
-    //        stack.setCount(this.getMaxStackSize());
-    //    }
-    //    this.setChanged();
-    //}
-
     public boolean canContinueUse(Player player) {
         return level.getBlockEntity(worldPosition) == this && player.distanceToSqr(Vec3.atCenterOf(worldPosition)) <= 64;
     }
-
-    //@Override
-    //public void clearContent() {
-    //    inventory.clear();
-    //}
 }

@@ -21,7 +21,7 @@ public class BarrelBlockEntity extends AbstractOpenableStorageBlockEntity {
 
     public void checkViewerCount() {
         //noinspection ConstantConditions
-        viewerCount = AbstractOpenableStorageBlockEntity.countViewers(level, this, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ());
+        viewerCount = AbstractOpenableStorageBlockEntity.countViewers(level, this.getContainerWrapper(), worldPosition.getX(), worldPosition.getY(), worldPosition.getZ());
         if (viewerCount > 0) {
             this.scheduleViewCountCheck();
         } else {
