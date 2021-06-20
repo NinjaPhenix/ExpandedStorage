@@ -125,7 +125,6 @@ public abstract class AbstractOpenableStorageBlockEntity extends AbstractStorage
         return container.get();
     }
 
-
     @NotNull
     @Override
     public <T> LazyOptional<T> getCapability(@NotNull Capability<T> capability, @Nullable Direction side) {
