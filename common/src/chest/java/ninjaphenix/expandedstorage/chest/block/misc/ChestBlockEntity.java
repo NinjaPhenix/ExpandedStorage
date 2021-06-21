@@ -77,32 +77,32 @@ public final class ChestBlockEntity extends AbstractOpenableStorageBlockEntity i
         level.playSound(null, soundPos.x(), soundPos.y(), soundPos.z(), soundEvent, SoundSource.BLOCKS, 0.5F, level.random.nextFloat() * 0.1F + 0.9F);
     }
 
-    //@Override
-    //public void startOpen(Player player) {
-    //    if (player.isSpectator()) {
-    //        return;
-    //    }
-    //    if (viewerCount < 0) {
-    //        viewerCount = 0;
-    //    }
-    //    viewerCount++;
-    //    this.onInvOpenOrClose();
-    //}
+    @Override
+    public void startOpen(Player player) {
+        if (player.isSpectator()) {
+            return;
+        }
+        if (viewerCount < 0) {
+            viewerCount = 0;
+        }
+        viewerCount++;
+        this.onInvOpenOrClose();
+    }
 
-    //@Override
-    //public void stopOpen(final Player player) {
-    //    if (player.isSpectator()) {
-    //        return;
-    //    }
-    //    viewerCount--;
-    //    this.onInvOpenOrClose();
-    //}
+    @Override
+    public void stopOpen(final Player player) {
+        if (player.isSpectator()) {
+            return;
+        }
+        viewerCount--;
+        this.onInvOpenOrClose();
+    }
 
-    //@SuppressWarnings("ConstantConditions")
-    //private void onInvOpenOrClose() {
-    //    if (this.getBlockState().getBlock() instanceof ChestBlock block) {
-    //        level.blockEvent(worldPosition, block, ChestBlock.SET_OPEN_COUNT_EVENT, viewerCount);
-    //        level.updateNeighborsAt(worldPosition, block);
-    //    }
-    //}
+    @SuppressWarnings("ConstantConditions")
+    private void onInvOpenOrClose() {
+        if (this.getBlockState().getBlock() instanceof ChestBlock block) {
+            level.blockEvent(worldPosition, block, ChestBlock.SET_OPEN_COUNT_EVENT, viewerCount);
+            level.updateNeighborsAt(worldPosition, block);
+        }
+    }
 }

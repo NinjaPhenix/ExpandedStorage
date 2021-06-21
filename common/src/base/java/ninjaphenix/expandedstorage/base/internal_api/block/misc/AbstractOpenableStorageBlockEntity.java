@@ -10,7 +10,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.CompoundContainer;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
-import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -23,16 +22,14 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemHandlerHelper;
 import ninjaphenix.expandedstorage.base.internal_api.block.AbstractOpenableStorageBlock;
 import ninjaphenix.expandedstorage.base.internal_api.inventory.AbstractContainerMenu_;
-import ninjaphenix.expandedstorage.base.internal_api.inventory.CompoundWorldlyContainer;
 import org.jetbrains.annotations.ApiStatus.Experimental;
 import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-import java.util.function.IntUnaryOperator;
 import java.util.function.Supplier;
 
 @Internal
@@ -42,7 +39,6 @@ public abstract class AbstractOpenableStorageBlockEntity extends AbstractStorage
     protected Component containerName;
     private int slots;
     private NonNullList<ItemStack> inventory;
-    private int[] slotsForFace;
     private LazyOptional<IItemHandler> itemHandler;
     private final Supplier<Container> container = Suppliers.memoize(() -> new Container() {
         @Override
@@ -102,6 +98,16 @@ public abstract class AbstractOpenableStorageBlockEntity extends AbstractStorage
         public void clearContent() {
             inventory.clear();
         }
+
+        @Override
+        public void startOpen(Player player) {
+            AbstractOpenableStorageBlockEntity.this.startOpen(player);
+        }
+
+        @Override
+        public void stopOpen(Player player) {
+            AbstractOpenableStorageBlockEntity.this.stopOpen(player);
+        }
     });
 
     public AbstractOpenableStorageBlockEntity(BlockEntityType<?> blockEntityType, ResourceLocation blockId) {
@@ -110,6 +116,14 @@ public abstract class AbstractOpenableStorageBlockEntity extends AbstractStorage
         if (blockId != null) {
             this.initialise(blockId);
         }
+    }
+
+    protected void startOpen(Player player) {
+
+    }
+
+    protected void stopOpen(Player player) {
+
     }
 
     protected static int countViewers(Level level, Container container, int x, int y, int z) {
@@ -153,8 +167,8 @@ public abstract class AbstractOpenableStorageBlockEntity extends AbstractStorage
 
             @NotNull
             @Override
-            public ItemStack insertItem(int slot, @NotNull ItemStack item, boolean simulate) {
-                return ItemStack.EMPTY; // todo: implement
+            public ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
+               return ItemStack.EMPTY;
             }
 
             @NotNull
@@ -164,12 +178,12 @@ public abstract class AbstractOpenableStorageBlockEntity extends AbstractStorage
             }
 
             @Override
-            public int getSlotLimit(int i) {
+            public int getSlotLimit(int slot) {
                 return 64;
             }
 
             @Override
-            public boolean isItemValid(int i, @NotNull ItemStack arg) {
+            public boolean isItemValid(int slot, @NotNull ItemStack stack) {
                 return true;
             }
         };
@@ -178,8 +192,6 @@ public abstract class AbstractOpenableStorageBlockEntity extends AbstractStorage
     private void initialise(ResourceLocation blockId) {
         if (Registry.BLOCK.get(blockId) instanceof AbstractOpenableStorageBlock block) {
             slots = block.getSlotCount();
-            slotsForFace = new int[slots];
-            Arrays.setAll(slotsForFace, IntUnaryOperator.identity());
             inventory = NonNullList.withSize(slots, ItemStack.EMPTY);
             containerName = block.getContainerName();
         }
