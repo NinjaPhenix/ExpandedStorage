@@ -1,6 +1,7 @@
 package ninjaphenix.expandedstorage.base.internal_api.block.misc;
 
 import com.google.common.base.Suppliers;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.Registry;
@@ -22,7 +23,6 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
 import ninjaphenix.expandedstorage.base.internal_api.block.AbstractOpenableStorageBlock;
 import ninjaphenix.expandedstorage.base.internal_api.inventory.AbstractContainerMenu_;
 import org.jetbrains.annotations.ApiStatus.Experimental;
@@ -144,7 +144,7 @@ public abstract class AbstractOpenableStorageBlockEntity extends AbstractStorage
     public <T> LazyOptional<T> getCapability(@NotNull Capability<T> capability, @Nullable Direction side) {
         if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
             if (itemHandler == null) {
-                itemHandler = LazyOptional.of(this::createItemHandler);
+                itemHandler = LazyOptional.of(() -> this.createItemHandler(this.getLevel(), this.getBlockState(), this.getBlockPos(), side));
                 return itemHandler.cast();
             }
         }
@@ -152,23 +152,27 @@ public abstract class AbstractOpenableStorageBlockEntity extends AbstractStorage
     }
 
     @NotNull
-    private IItemHandler createItemHandler() {
+    protected IItemHandler createItemHandler(Level level, BlockState state, BlockPos pos, @Nullable Direction side) {
+        return AbstractOpenableStorageBlockEntity.createGenericItemHandler(this);
+    }
+
+    public static IItemHandler createGenericItemHandler(AbstractOpenableStorageBlockEntity entity) {
         return new IItemHandler() {
             @Override
             public int getSlots() {
-                return slots;
+                return entity.slots;
             }
 
             @NotNull
             @Override
             public ItemStack getStackInSlot(int slot) {
-                return inventory.get(slot);
+                return entity.inventory.get(slot);
             }
 
             @NotNull
             @Override
             public ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
-               return ItemStack.EMPTY;
+                return ItemStack.EMPTY;
             }
 
             @NotNull

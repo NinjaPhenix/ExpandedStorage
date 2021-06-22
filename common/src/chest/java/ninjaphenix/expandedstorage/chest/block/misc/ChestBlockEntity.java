@@ -1,5 +1,7 @@
 package ninjaphenix.expandedstorage.chest.block.misc;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -12,8 +14,12 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.TickableBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.items.IItemHandler;
+import ninjaphenix.expandedstorage.base.internal_api.block.AbstractChestBlock;
 import ninjaphenix.expandedstorage.base.internal_api.block.misc.AbstractOpenableStorageBlockEntity;
 import ninjaphenix.expandedstorage.chest.block.ChestBlock;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public final class ChestBlockEntity extends AbstractOpenableStorageBlockEntity implements TickableBlockEntity {
     private int viewerCount;
@@ -104,5 +110,11 @@ public final class ChestBlockEntity extends AbstractOpenableStorageBlockEntity i
             level.blockEvent(worldPosition, block, ChestBlock.SET_OPEN_COUNT_EVENT, viewerCount);
             level.updateNeighborsAt(worldPosition, block);
         }
+    }
+
+    @NotNull
+    @Override
+    protected IItemHandler createItemHandler(Level level, BlockState state, BlockPos pos, @Nullable Direction side) {
+        return AbstractChestBlock.createItemHandler(level, state, pos).orElse(AbstractOpenableStorageBlockEntity.createGenericItemHandler(this));
     }
 }

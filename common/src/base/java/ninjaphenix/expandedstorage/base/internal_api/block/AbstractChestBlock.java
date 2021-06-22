@@ -23,6 +23,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraftforge.items.IItemHandler;
 import ninjaphenix.expandedstorage.base.internal_api.Utils;
 import ninjaphenix.expandedstorage.base.internal_api.block.misc.AbstractOpenableStorageBlockEntity;
 import ninjaphenix.expandedstorage.base.internal_api.block.misc.AbstractStorageBlockEntity;
@@ -40,6 +41,22 @@ import java.util.function.BiPredicate;
 @Experimental
 public abstract class AbstractChestBlock<T extends AbstractOpenableStorageBlockEntity> extends AbstractOpenableStorageBlock {
     public static final EnumProperty<CursedChestType> CURSED_CHEST_TYPE = EnumProperty.create("type", CursedChestType.class);
+    private static final DoubleBlockCombiner.Combiner<AbstractOpenableStorageBlockEntity, Optional<IItemHandler>> inventoryGetter = new DoubleBlockCombiner.Combiner<>() {
+        @Override
+        public Optional<IItemHandler> acceptDouble(AbstractOpenableStorageBlockEntity first, AbstractOpenableStorageBlockEntity second) {
+            return Optional.empty();
+        }
+
+        @Override
+        public Optional<IItemHandler> acceptSingle(AbstractOpenableStorageBlockEntity single) {
+            return Optional.of(AbstractOpenableStorageBlockEntity.createGenericItemHandler(single));
+        }
+
+        @Override
+        public Optional<IItemHandler> acceptNone() {
+            return Optional.empty();
+        }
+    };
     private final DoubleBlockCombiner.Combiner<T, Optional<ContainerMenuFactory>> menuGetter = new DoubleBlockCombiner.Combiner<>() {
         @Override
         public Optional<ContainerMenuFactory> acceptDouble(T first, T second) {
@@ -264,7 +281,7 @@ public abstract class AbstractChestBlock<T extends AbstractOpenableStorageBlockE
 
     public final NeighborCombineResult<? extends T> combine(BlockState state, LevelAccessor level, BlockPos pos, boolean alwaysOpen) {
         BiPredicate<LevelAccessor, BlockPos> isChestBlocked = alwaysOpen ? (_level, _pos) -> false : this::isBlocked;
-        return DoubleBlockCombiner.combineWithNeigbour(blockEntityType(), AbstractChestBlock::getBlockType,
+        return DoubleBlockCombiner.combineWithNeigbour(this.blockEntityType(), AbstractChestBlock::getBlockType,
                 AbstractChestBlock::getDirectionToAttached, BlockStateProperties.HORIZONTAL_FACING, state, level, pos,
                 isChestBlocked);
     }
@@ -278,5 +295,12 @@ public abstract class AbstractChestBlock<T extends AbstractOpenableStorageBlockE
     @Override
     protected ContainerMenuFactory createContainerFactory(BlockState state, LevelAccessor level, BlockPos pos) {
         return this.combine(state, level, pos, false).apply(menuGetter).orElse(null);
+    }
+
+    public static Optional<IItemHandler> createItemHandler(Level level, BlockState state, BlockPos pos) {
+        if (state.getBlock() instanceof AbstractChestBlock<?> block) {
+            return block.combine(state, level, pos, false).apply(AbstractChestBlock.inventoryGetter);
+        }
+        return Optional.empty();
     }
 }
