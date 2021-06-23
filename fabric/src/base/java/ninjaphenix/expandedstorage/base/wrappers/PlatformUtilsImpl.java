@@ -2,8 +2,10 @@ package ninjaphenix.expandedstorage.base.wrappers;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
@@ -11,12 +13,19 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import ninjaphenix.expandedstorage.base.internal_api.Utils;
 import ninjaphenix.expandedstorage.base.internal_api.inventory.ClientContainerMenuFactory;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.function.Supplier;
 
 final class PlatformUtilsImpl implements PlatformUtils {
     private static PlatformUtilsImpl INSTANCE;
-    private Boolean isClient;
+    private final KeyMapping configKeyMapping;
+    private final boolean isClient;
+
+    private PlatformUtilsImpl() {
+        isClient = FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;
+        configKeyMapping = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.expandedstorage.config", GLFW.GLFW_KEY_E, "key.categories.inventory"));
+    }
 
     public static PlatformUtilsImpl getInstance() {
         if (INSTANCE == null) {
@@ -38,9 +47,6 @@ final class PlatformUtilsImpl implements PlatformUtils {
 
     @Override
     public boolean isClient() {
-        if (isClient == null) {
-            isClient = FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;
-        }
         return isClient;
     }
 
@@ -52,5 +58,10 @@ final class PlatformUtilsImpl implements PlatformUtils {
     @Override
     public boolean isModLoaded(String modId) {
         return FabricLoader.getInstance().isModLoaded(modId);
+    }
+
+    @Override
+    public KeyMapping getConfigScreenKeyMapping() {
+        return configKeyMapping;
     }
 }

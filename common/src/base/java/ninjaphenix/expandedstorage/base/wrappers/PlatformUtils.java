@@ -1,5 +1,6 @@
 package ninjaphenix.expandedstorage.base.wrappers;
 
+import net.minecraft.client.KeyMapping;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
@@ -21,4 +22,6 @@ public interface PlatformUtils {
     <T extends AbstractContainerMenu> MenuType<T> createMenuType(ResourceLocation menuType, ClientContainerMenuFactory<T> factory);
 
     boolean isModLoaded(String modId);
+
+    KeyMapping getConfigScreenKeyMapping();
 }
