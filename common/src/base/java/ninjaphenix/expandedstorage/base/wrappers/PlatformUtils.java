@@ -2,6 +2,7 @@ package ninjaphenix.expandedstorage.base.wrappers;
 
 import com.mojang.datafixers.types.Type;
 import net.minecraft.core.BlockPos;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
@@ -31,4 +32,6 @@ public interface PlatformUtils {
     <T extends BlockEntity> BlockEntityType<T> createBlockEntityType(BiFunction<BlockPos, BlockState, T> blockEntitySupplier, Set<Block> blocks, Type<?> type);
 
     boolean isModLoaded(String modId);
+
+    KeyMapping getConfigScreenKeyMapping();
 }

@@ -12,6 +12,7 @@ import net.minecraft.world.entity.player.Inventory;
 import ninjaphenix.expandedstorage.base.internal_api.inventory.AbstractContainerMenu_;
 import ninjaphenix.expandedstorage.base.inventory.screen.ScreenMeta;
 import ninjaphenix.expandedstorage.base.wrappers.NetworkWrapper;
+import ninjaphenix.expandedstorage.base.wrappers.PlatformUtils;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
@@ -50,12 +51,12 @@ public abstract class AbstractScreen<T extends AbstractContainerMenu_<R>, R exte
     @Override
     @SuppressWarnings("ConstantConditions")
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == GLFW.GLFW_KEY_ESCAPE || minecraft.options.keyInventory.matches(keyCode, scanCode)) {
-            if (Screen.hasShiftDown()) {
-                NetworkWrapper.getInstance().c2s_openTypeSelectScreen();
-            } else {
-                minecraft.player.closeContainer();
-            }
+        if (PlatformUtils.getInstance().getConfigScreenKeyMapping().matches(keyCode, scanCode) && Screen.hasShiftDown()) {
+            NetworkWrapper.getInstance().c2s_openTypeSelectScreen();
+            return true;
+        }
+        else if (keyCode == GLFW.GLFW_KEY_ESCAPE || minecraft.options.keyInventory.matches(keyCode, scanCode)) {
+            minecraft.player.closeContainer();
             return true;
         }
         return super.keyPressed(keyCode, scanCode, modifiers);
