@@ -1,3 +1,17 @@
+plugins {
+    id("dev.architectury.loom")
+}
+
+loom {
+    silentMojangMappingsLicense()
+    useFabricMixin = true
+}
+
+dependencies {
+    minecraft("com.mojang:minecraft:${properties["minecraft_version"]}")
+    mappings(loom.officialMojangMappings())
+}
+
 repositories {
     maven {
         // JEI maven
@@ -20,7 +34,7 @@ dependencies {
 }
 
 tasks.withType<ProcessResources>() {
-    val props = mapOf("version" to project.version)
+    val props = mutableMapOf("version" to project.version) // Needs to be mutable
     inputs.properties(props)
     filesMatching("META-INF/mods.toml") {
         expand(props)
