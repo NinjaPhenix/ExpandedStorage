@@ -69,12 +69,10 @@ subprojects {
         dependsOn(remapJarTask)
         from(zipTree(remapJarTask.outputs.files.singleFile))
         archiveFileName.set("${properties["archivesBaseName"]}-${properties["mod_version"]}+${properties["minecraft_version"]}.jar")
-
         filesMatching(listOf("**/*.json", "**/*.mcmeta")) {
             var lines = StringBuilder()
             var openBrackets = 0
             val slurper = JsonSlurper()
-
             filter { line ->
                 if (line != "") {
                     openBrackets += line.count { it == '{' } - line.count { it == '}' }
@@ -85,7 +83,6 @@ subprojects {
                         return@filter JsonOutput.toJson(slurper.parseText(json))
                     }
                 }
-
                 return@filter null // Wish I could suppress this, not an error
             }
         }
