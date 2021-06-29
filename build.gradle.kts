@@ -55,8 +55,28 @@ subprojects {
         }
     }
 
+    repositories {
+        mavenLocal()
+    }
+
+    dependencies {
+        annotationProcessor("com.github.bsideup.jabel:jabel-javac-plugin:0.4.0")
+        compileOnly("com.github.bsideup.jabel:jabel-javac-plugin:0.4.0")
+    }
+
+    val minecraft_java_version : String by project
+
     tasks.withType<JavaCompile>().configureEach {
         options.encoding = "UTF-8"
+        if ("I_HATE_INTELLIJ_AND_GRADLE" in System.getenv()) {
+            options.release.set(minecraft_java_version.toInt())
+        }
+    }
+
+    tasks.withType<JavaExec>().configureEach {
+        javaLauncher.set(javaToolchains.launcherFor {
+            languageVersion.set(JavaLanguageVersion.of(minecraft_java_version.toInt()))
+        })
     }
 
     val remapJarTask : Jar = tasks.getByName<Jar>("remapJar") {

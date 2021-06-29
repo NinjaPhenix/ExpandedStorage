@@ -5,8 +5,16 @@ plugins {
 loom {
     silentMojangMappingsLicense()
     useFabricMixin = true
+    runs {
+        named("client") {
+            vmArgs("-XX:+IgnoreUnrecognizedVMOptions")
+        }
+        named("server") {
+            vmArgs("-XX:+IgnoreUnrecognizedVMOptions")
+        }
+    }
 
-    accessWidener = file("src/common/resources/expandedstorage.accessWidener")
+    accessWidener = file("src/base/resources/expandedstorage_base.accessWidener")
 }
 
 dependencies {
@@ -45,8 +53,8 @@ dependencies {
     modCompileOnly("com.github.Virtuoel:Towelette:e5e39eb", excludeFabric)
 
     // For base module
-    modCompileOnly("me.shedaniel:RoughlyEnoughItems-api-fabric:${properties["rei_version"]}", excludeFabric)
-    modRuntime("me.shedaniel:RoughlyEnoughItems-fabric:${properties["rei_version"]}")
+    modCompileOnly("me.shedaniel:RoughlyEnoughItems:${properties["rei_version"]}", excludeFabric)
+    modRuntime("me.shedaniel:RoughlyEnoughItems:${properties["rei_version"]}")
 
     modCompileOnly("com.terraformersmc:modmenu:${properties["modmenu_version"]}", excludeFabric)
     modRuntime("com.terraformersmc:modmenu:${properties["modmenu_version"]}")

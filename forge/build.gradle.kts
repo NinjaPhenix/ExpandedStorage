@@ -5,6 +5,14 @@ plugins {
 loom {
     silentMojangMappingsLicense()
     useFabricMixin = true
+    runs {
+        named("client") {
+            vmArgs("-XX:+IgnoreUnrecognizedVMOptions")
+        }
+        named("server") {
+            vmArgs("-XX:+IgnoreUnrecognizedVMOptions")
+        }
+    }
 }
 
 dependencies {
