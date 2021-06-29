@@ -1,10 +1,12 @@
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
+import ninjaphenix.gradle.task.MinifyJsonTask
 import org.gradle.jvm.tasks.Jar
 
 plugins {
     java
     id("dev.architectury.loom").version("0.8.0-SNAPSHOT").apply(false)
+    id("ninjaphenix.gradle.gradle-utils").version("0.0.16")
 }
 
 subprojects {
@@ -57,7 +59,7 @@ subprojects {
         options.encoding = "UTF-8"
     }
 
-    val remapJarTask = tasks.getByName<Jar>("remapJar") {
+    val remapJarTask : Jar = tasks.getByName<Jar>("remapJar") {
         archiveFileName.set("${properties["archivesBaseName"]}-${properties["mod_version"]}+${properties["minecraft_version"]}-fat.jar")
     }
 
@@ -65,26 +67,11 @@ subprojects {
         archiveFileName.set("${properties["archivesBaseName"]}-${properties["mod_version"]}+${properties["minecraft_version"]}-dev.jar")
     }
 
-    tasks.create("minJar", Jar::class) {
-        dependsOn(remapJarTask)
-        from(zipTree(remapJarTask.outputs.files.singleFile))
+    tasks.register<MinifyJsonTask>("minJar") {
+        parent.set(remapJarTask.outputs.files.singleFile)
+        filePatterns.set(listOf("**/*.json", "**/*.mcmeta"))
         archiveFileName.set("${properties["archivesBaseName"]}-${properties["mod_version"]}+${properties["minecraft_version"]}.jar")
-        filesMatching(listOf("**/*.json", "**/*.mcmeta")) {
-            var lines = StringBuilder()
-            var openBrackets = 0
-            val slurper = JsonSlurper()
-            filter { line ->
-                if (line != "") {
-                    openBrackets += line.count { it == '{' } - line.count { it == '}' }
-                    lines.append(line)
-                    if (openBrackets == 0) {
-                        val json = lines.toString()
-                        lines = StringBuilder()
-                        return@filter JsonOutput.toJson(slurper.parseText(json))
-                    }
-                }
-                return@filter null // Wish I could suppress this, not an error
-            }
-        }
+
+        dependsOn(remapJarTask)
     }
 }
