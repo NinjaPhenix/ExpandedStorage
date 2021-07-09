@@ -81,7 +81,7 @@ public abstract class AbstractScreen<T extends AbstractContainerMenu_<R>, R exte
         private final int textureWidth;
         private final int textureHeight;
 
-        protected Image(int x, int y, int width, int height, int textureX, int textureY, int textureWidth, int textureHeight) {
+        Image(int x, int y, int width, int height, int textureX, int textureY, int textureWidth, int textureHeight) {
             this.x = x;
             this.y = y;
             this.width = width;
