@@ -1,6 +1,5 @@
 package ninjaphenix.expandedstorage.base;
 
-import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.MenuType;
@@ -26,8 +25,6 @@ import ninjaphenix.expandedstorage.base.internal_api.BaseApi;
 import ninjaphenix.expandedstorage.base.internal_api.Utils;
 import ninjaphenix.expandedstorage.base.wrappers.PlatformUtils;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 

@@ -37,11 +37,10 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 final class NetworkWrapperImpl implements NetworkWrapper {
-    private static NetworkWrapperImpl INSTANCE;
     private static final ResourceLocation OPEN_SELECT_SCREEN = Utils.resloc("open_select_screen");
     private static final ResourceLocation UPDATE_PLAYER_PREFERENCE = Utils.resloc("update_player_preference");
     private static final ResourceLocation REMOVE_TYPE_SELECT_CALLBACK = Utils.resloc("remove_type_select_callback");
-
+    private static NetworkWrapperImpl INSTANCE;
     private final Map<UUID, Consumer<ResourceLocation>> preferenceCallbacks = new HashMap<>();
     private final Map<UUID, ResourceLocation> playerPreferences = new HashMap<>();
     private final Map<ResourceLocation, ServerContainerMenuFactory> containerFactories = Utils.unmodifiableMap(map -> {

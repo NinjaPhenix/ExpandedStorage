@@ -23,9 +23,9 @@ import java.util.function.Supplier;
 
 final class PlatformUtilsImpl implements PlatformUtils {
     private static PlatformUtilsImpl INSTANCE;
-    private final Supplier<Object> configKeyMapping = Suppliers.memoize(this::createConfigKey);
-    private boolean configKeyRequiresShift = true;
     private final boolean isClient;
+    private boolean configKeyRequiresShift = true;
+    private final Supplier<Object> configKeyMapping = Suppliers.memoize(this::createConfigKey);
 
     private PlatformUtilsImpl() {
         isClient = FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;

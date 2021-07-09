@@ -57,8 +57,7 @@ public abstract class AbstractScreen<T extends AbstractContainerMenu_<R>, R exte
                 (!keyRequiresShift || keyRequiresShift && Screen.hasShiftDown())) {
             NetworkWrapper.getInstance().c2s_openTypeSelectScreen();
             return true;
-        }
-        else if (keyCode == GLFW.GLFW_KEY_ESCAPE || minecraft.options.keyInventory.matches(keyCode, scanCode)) {
+        } else if (keyCode == GLFW.GLFW_KEY_ESCAPE || minecraft.options.keyInventory.matches(keyCode, scanCode)) {
             minecraft.player.closeContainer();
             return true;
         }

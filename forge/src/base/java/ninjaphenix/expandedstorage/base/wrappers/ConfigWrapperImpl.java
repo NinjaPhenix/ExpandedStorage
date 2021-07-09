@@ -12,7 +12,6 @@ import ninjaphenix.expandedstorage.base.config.ConfigV0;
 import ninjaphenix.expandedstorage.base.config.Converter;
 import ninjaphenix.expandedstorage.base.config.LegacyFactory;
 import ninjaphenix.expandedstorage.base.internal_api.Utils;
-import ninjaphenix.expandedstorage.base.wrappers.ConfigWrapper;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
