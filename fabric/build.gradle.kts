@@ -27,9 +27,16 @@ repositories {
         name = "Shedaniel"
         url = uri("https://maven.shedaniel.me/")
     }
-    maven {
-        name = "TerraformersMC"
-        url = uri("https://maven.terraformersmc.com/")
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "TerraformersMC"
+                url = uri("https://maven.terraformersmc.com/")
+            }
+        }
+        filter {
+            includeGroup("com.terraformersmc")
+        }
     }
     maven {
         name = "JitPack"
@@ -37,6 +44,10 @@ repositories {
         content {
             includeGroup("com.github.Virtuoel")
         }
+    }
+    maven {
+        name = "Siphalor's Maven"
+        url = uri("https://maven.siphalor.de/")
     }
 }
 
@@ -58,6 +69,8 @@ dependencies {
 
     modCompileOnly("io.github.prospector:modmenu:${properties["modmenu_version"]}", excludeFabric)
     modRuntime("io.github.prospector:modmenu:${properties["modmenu_version"]}")
+
+    modCompileOnly("de.siphalor:amecsapi-1.16:1.1+")
 }
 
 tasks.withType<ProcessResources>() {

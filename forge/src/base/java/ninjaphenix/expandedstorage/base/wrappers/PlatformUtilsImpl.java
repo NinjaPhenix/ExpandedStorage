@@ -74,4 +74,9 @@ final class PlatformUtilsImpl implements PlatformUtils {
     public KeyMapping getConfigScreenKeyMapping() {
         return (KeyMapping) configKeyMapping.get();
     }
+
+    @Override
+    public boolean configKeyRequiresShift() {
+        return false;
+    }
 }

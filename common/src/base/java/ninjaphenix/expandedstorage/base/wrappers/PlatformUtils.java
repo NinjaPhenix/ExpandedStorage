@@ -24,4 +24,6 @@ public interface PlatformUtils {
     boolean isModLoaded(String modId);
 
     KeyMapping getConfigScreenKeyMapping();
+
+    boolean configKeyRequiresShift();
 }

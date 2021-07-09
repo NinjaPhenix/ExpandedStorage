@@ -63,11 +63,6 @@ public final class Main {
         new ninjaphenix.expandedstorage.old_chest.Main();
     }
 
-    private boolean regionIntersects(AbstractWidget widget, int x, int y, int width, int height) {
-        return widget.x <= x + width && y <= widget.y + widget.getHeight() ||
-                x <= widget.x + widget.getWidth() && widget.y <= y + height;
-    }
-
     @OnlyIn(Dist.CLIENT)
     private void registerConfigGuiHandler() {
         ModLoadingContext.get().getActiveContainer().registerExtensionPoint(ExtensionPoint.CONFIGGUIFACTORY, () -> (minecraft, screen) -> {
