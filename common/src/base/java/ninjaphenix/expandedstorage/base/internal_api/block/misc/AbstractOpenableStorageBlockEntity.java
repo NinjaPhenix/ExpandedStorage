@@ -23,6 +23,7 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemHandlerHelper;
 import ninjaphenix.expandedstorage.base.internal_api.block.AbstractOpenableStorageBlock;
 import ninjaphenix.expandedstorage.base.internal_api.inventory.AbstractContainerMenu_;
 import org.jetbrains.annotations.ApiStatus.Experimental;
@@ -145,8 +146,8 @@ public abstract class AbstractOpenableStorageBlockEntity extends AbstractStorage
         if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
             if (itemHandler == null) {
                 itemHandler = LazyOptional.of(() -> this.createItemHandler(this.getLevel(), this.getBlockState(), this.getBlockPos(), side));
-                return itemHandler.cast();
             }
+            return itemHandler.cast();
         }
         return super.getCapability(capability, side);
     }
@@ -172,13 +173,55 @@ public abstract class AbstractOpenableStorageBlockEntity extends AbstractStorage
             @NotNull
             @Override
             public ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
+                if (stack.isEmpty()) {
+                    return ItemStack.EMPTY;
+                }
+                var stackInSlot = entity.inventory.get(slot);
+                if (stackInSlot.isEmpty()) {
+                    if (!simulate) {
+                        entity.inventory.set(slot, stack);
+                        entity.setChanged();
+                    }
+                } else if(ItemHandlerHelper.canItemStacksStack(stackInSlot, stack)) {
+                    var limit = Math.min(stackInSlot.getMaxStackSize(), 64);
+                    var diff = limit - stackInSlot.getCount();
+                    if (diff != 0) {
+                        if (stack.getCount() > diff) {
+                            if (!simulate) {
+                                stackInSlot.setCount(limit);
+                                entity.setChanged();
+                            }
+                            return stack.split(diff);
+                        } else {
+                            if (!simulate) {
+                                stackInSlot.setCount(stackInSlot.getCount() + stack.getCount());
+                                entity.setChanged();
+                            }
+                        }
+                    } else {
+                        return stack;
+                    }
+                } else {
+                    return stack;
+                }
                 return ItemStack.EMPTY;
             }
 
             @NotNull
             @Override
             public ItemStack extractItem(int slot, int amount, boolean simulate) {
-                return ItemStack.EMPTY; // todo: implement
+                var stackInSlot = entity.inventory.get(slot);
+                if (stackInSlot.isEmpty()) {
+                    return ItemStack.EMPTY;
+                } else if (amount >= stackInSlot.getCount()) {
+                    if (!simulate) {
+                        entity.inventory.set(slot, ItemStack.EMPTY);
+                    }
+                    return stackInSlot;
+                } else {
+                    var copy = simulate ? stackInSlot.copy() : stackInSlot;
+                    return copy.split(amount);
+                }
             }
 
             @Override
