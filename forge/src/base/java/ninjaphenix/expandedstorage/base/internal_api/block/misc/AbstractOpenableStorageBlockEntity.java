@@ -20,6 +20,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.extensions.IForgeItem;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
@@ -191,7 +192,7 @@ public abstract class AbstractOpenableStorageBlockEntity extends AbstractStorage
                                 stackInSlot.setCount(limit);
                                 entity.setChanged();
                             }
-                            return stack.split(diff);
+                            return simulate ? stack.copy().split(stack.getCount() - diff) : stack.split(stack.getCount() - diff);
                         } else {
                             if (!simulate) {
                                 stackInSlot.setCount(stackInSlot.getCount() + stack.getCount());
