@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/template_shulker_box",
+  "textures": {
+    "particle": "expandedstorage:block/lime_iron_shulker_box"
+  }
+}

@@ -2,6 +2,7 @@ package ninjaphenix.expandedstorage.shulkerboxes;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -71,7 +72,7 @@ public final class ShulkerCommon {
         return false;
     }
 
-    public static void registerTabIcon(BlockItem item) {
+    public static void registerTabIcon(Item item) {
         BaseApi.getInstance().offerTabIcon(item, ShulkerCommon.ICON_SUITABILITY);
     }
 
