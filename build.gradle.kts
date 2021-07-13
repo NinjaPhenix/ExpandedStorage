@@ -29,10 +29,12 @@ subprojects {
                         "src/base/java",
                         "src/chest/java",
                         "src/old_chest/java",
+                        "src/shulkerboxes/java",
                         rootDir.resolve("common/${project.name}Src/barrel/java"),
                         rootDir.resolve("common/${project.name}Src/base/java"),
                         rootDir.resolve("common/${project.name}Src/chest/java"),
-                        rootDir.resolve("common/${project.name}Src/old_chest/java")
+                        rootDir.resolve("common/${project.name}Src/old_chest/java"),
+                        rootDir.resolve("common/${project.name}Src/shulkerboxes/java")
                 ))
             }
             resources {
@@ -41,11 +43,13 @@ subprojects {
                         "src/base/resources",
                         "src/chest/resources",
                         "src/old_chest/resources",
+                        "src/shulkerboxes/resources",
                         "src/common/resources",
                         rootDir.resolve("common/${project.name}Src/barrel/resources"),
                         rootDir.resolve("common/${project.name}Src/base/resources"),
                         rootDir.resolve("common/${project.name}Src/chest/resources"),
                         rootDir.resolve("common/${project.name}Src/old_chest/resources"),
+                        rootDir.resolve("common/${project.name}Src/shulkerboxes/resources"),
                         rootDir.resolve("common/${project.name}Src/common/resources"),
                         rootDir.resolve("common/${project.name}Src/chest_compat/resources")
                 ))
