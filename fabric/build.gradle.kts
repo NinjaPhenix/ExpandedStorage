@@ -7,6 +7,8 @@ loom {
     useFabricMixin = true
 
     accessWidener = file("src/common/resources/expandedstorage.accessWidener")
+
+    customManifest = "https://gist.githubusercontent.com/modmuss50/6e00baf80dcbaa42f3a2fc846b290128/raw/f035ef8f75164f56ec6352809a34841d326bae1c/1_18_experimental-snapshot-1.json"
 }
 
 dependencies {
